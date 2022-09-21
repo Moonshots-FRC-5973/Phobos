@@ -29,13 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.drives.ArcadeDrive;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -56,35 +56,25 @@ public class Phobos extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    private Servo armServo;
-    double  MIN_POSITION = 0, MAX_POSITION = 1;
-    double armPosition = .5;
+
+    // ----------
+    // SUBSYSTEMS
+    private ArcadeDrive drive = new ArcadeDrive(hardwareMap);
+    private Claw claw = new Claw(hardwareMap, telemetry);
+
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-        armServo = hardwareMap.servo.get(Constants.ARM_SERVO_NAME);
-
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
-
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
 
-        armPosition = 0.5;
+        // INIT SUBSYSTEMS
+        drive.init();
+        claw.init();
+
     }
 
     /*
@@ -111,35 +101,30 @@ public class Phobos extends OpMode
         double leftPower;
         double rightPower;
 
-        // Choose to drive using either Tank Mode, or POV Mode
-        // Comment out the method that's not used.  The default below is POV.
-
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
-        double drive = -gamepad1.left_stick_y;
+        double fwd = -gamepad1.left_stick_y;
         double turn  = -gamepad1.right_stick_x;
-        leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-        rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+        leftPower    = Range.clip(fwd + turn, -1.0, 1.0) ;
+        rightPower   = Range.clip(fwd - turn, -1.0, 1.0) ;
+        drive.drive(leftPower, rightPower);
 
 
-        // Send calculated power to wheels
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
 
         // ---------
         // SERVO TEST
         // move arm down on A button if not already at lowest position.
-        if (gamepad1.a && armPosition > MIN_POSITION) armPosition -= .01;
+        if (gamepad1.a) claw.open();
 
         // move arm up on B button if not already at the highest position.
-        if (gamepad1.b && armPosition < MAX_POSITION) armPosition += .01;
+        if (gamepad1.b) claw.close();
 
-        armServo.setPosition(Range.clip(armPosition, MIN_POSITION, MAX_POSITION));
 
+        // -----------------
+        // TELEMETRY UPDATES
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-        telemetry.addData("arm servo", "position=" + armPosition + "  actual=" + armServo.getPosition());
     }
 
     /*
@@ -147,6 +132,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void stop() {
+        drive.stop();
     }
 
 }

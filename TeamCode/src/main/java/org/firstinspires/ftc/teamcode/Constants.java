@@ -6,9 +6,13 @@ public class Constants {
     // _______________
     // ---  DRIVE  ---
     public static final double ANGLE_TOLERANCE = 1;
+    public static final String LEFT_DRIVE = "left_drive";
+    public static final String RIGHT_DRIVE = "right_drive";
+
     // ________________
     // ---  SERVOS  ---
     public static final String ARM_SERVO_NAME = "servo0";
+
     // ________________
     // ---  SENSOR  ---
     public static final String GYRO_NAME = "gyro";
