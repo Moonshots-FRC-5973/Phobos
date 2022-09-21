@@ -14,12 +14,10 @@ public class Claw {
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
 
-    public Claw(HardwareMap hardwareMap, Telemetry telemetry){
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
-    }
-
-    public void init(){
         armServo = hardwareMap.servo.get(Constants.ARM_SERVO_NAME);
         armPosition = 0.5;
     }

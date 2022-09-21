@@ -12,11 +12,8 @@ public class ArcadeDrive {
     private int check = 0;
     private double requestedRotation;
 
-    public ArcadeDrive(HardwareMap hardwareMap){
+    public void init(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
-    }
-
-    public void init(){
         leftDrive  = hardwareMap.get(DcMotor.class, Constants.LEFT_DRIVE);
         rightDrive = hardwareMap.get(DcMotor.class, Constants.RIGHT_DRIVE);
 

@@ -59,8 +59,8 @@ public class Phobos extends OpMode
 
     // ----------
     // SUBSYSTEMS
-    private ArcadeDrive drive = new ArcadeDrive(hardwareMap);
-    private Claw claw = new Claw(hardwareMap, telemetry);
+    private ArcadeDrive drive = new ArcadeDrive();
+    private Claw claw = new Claw();
 
 
     /*
@@ -72,8 +72,8 @@ public class Phobos extends OpMode
         telemetry.addData("Status", "Initialized");
 
         // INIT SUBSYSTEMS
-        drive.init();
-        claw.init();
+        drive.init(hardwareMap);
+        claw.init(hardwareMap, telemetry);
 
     }
 
