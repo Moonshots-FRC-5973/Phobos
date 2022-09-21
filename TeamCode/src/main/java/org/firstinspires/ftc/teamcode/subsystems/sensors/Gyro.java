@@ -5,9 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.v1.constants.GyroConstants;
-import org.firstinspires.ftc.teamcode.v1.constants.UnitConstants;
-import org.firstinspires.ftc.teamcode.v1.systems.sli.Vec2;
+import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
 
 public class Gyro {
     private BNO055IMU imu;
@@ -30,13 +29,13 @@ public class Gyro {
         if(startLocation != null)
             Gyro.location = startLocation;
 
-        this.imu = hardwareMap.get(BNO055IMU.class, GyroConstants.DEVICE_NAME);
-        this.parameters.angleUnit = UnitConstants.ANGLE_UNIT;
-        this.parameters.accelUnit = UnitConstants.ACCEL_UNIT;
+        this.imu = hardwareMap.get(BNO055IMU.class, Constants.GYRO_NAME);
+        this.parameters.angleUnit = Constants.ANGLE_UNIT;
+        this.parameters.accelUnit = Constants.ACCEL_UNIT;
 
-        if(!GyroConstants.CALIBRATION_FILE_NAME.equals("")) {
+        if(!Constants.CALIBRATION_FILE_NAME.equals("")) {
             this.parameters.loggingEnabled = true;
-            this.parameters.calibrationDataFile = GyroConstants.CALIBRATION_FILE_NAME;
+            this.parameters.calibrationDataFile = Constants.CALIBRATION_FILE_NAME;
         } else {
             this.parameters.loggingEnabled = false;
         }
@@ -49,7 +48,7 @@ public class Gyro {
      * @return the X angle of the internal IMU in the control panel.
      */
     public double getXAngle() {
-        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, UnitConstants.ANGLE_UNIT.toAngleUnit()).firstAngle);
+        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, Constants.ANGLE_UNIT.toAngleUnit()).firstAngle);
     }
 
     /**
@@ -57,7 +56,7 @@ public class Gyro {
      * @return the Y angle of the internal IMU in the control panel.
      */
     public double getYAngle() {
-        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, UnitConstants.ANGLE_UNIT.toAngleUnit()).secondAngle);
+        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, Constants.ANGLE_UNIT.toAngleUnit()).secondAngle);
     }
 
     /**
@@ -65,7 +64,7 @@ public class Gyro {
      * @return the Z angle of the internal IMU in the control panel.
      */
     public double getZAngle() {
-        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, UnitConstants.ANGLE_UNIT.toAngleUnit()).thirdAngle);
+        return (double)(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, Constants.ANGLE_UNIT.toAngleUnit()).thirdAngle);
     }
 
     /**

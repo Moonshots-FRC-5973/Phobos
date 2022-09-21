@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -57,7 +58,9 @@ public class Phobos extends OpMode
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
-
+    private Servo armServo;
+    double  MIN_POSITION = 0, MAX_POSITION = 1;
+    double armPosition = .5;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -70,6 +73,7 @@ public class Phobos extends OpMode
         // step (using the FTC Robot Controller app on the phone).
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        armServo = hardwareMap.servo.get(Constants.ARM_SERVO_NAME);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -79,6 +83,8 @@ public class Phobos extends OpMode
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+
+        armPosition = 0.5;
     }
 
     /*
@@ -115,18 +121,25 @@ public class Phobos extends OpMode
         leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
         rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
-        // Tank Mode uses one stick to control each wheel.
-        // - This requires no math, but it is hard to drive forward slowly and keep straight.
-        // leftPower  = -gamepad1.left_stick_y ;
-        // rightPower = -gamepad1.right_stick_y ;
 
         // Send calculated power to wheels
         leftDrive.setPower(leftPower);
         rightDrive.setPower(rightPower);
 
+        // ---------
+        // SERVO TEST
+        // move arm down on A button if not already at lowest position.
+        if (gamepad1.a && armPosition > MIN_POSITION) armPosition -= .01;
+
+        // move arm up on B button if not already at the highest position.
+        if (gamepad1.b && armPosition < MAX_POSITION) armPosition += .01;
+
+        armServo.setPosition(Range.clip(armPosition, MIN_POSITION, MAX_POSITION));
+
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("arm servo", "position=" + armPosition + "  actual=" + armServo.getPosition());
     }
 
     /*
