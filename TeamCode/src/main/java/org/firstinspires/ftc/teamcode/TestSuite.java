@@ -43,6 +43,9 @@ public class TestSuite extends OpMode {
                 -0.75,
                 0.75
         ));
+        telemetry.addData("Motor Port 2 Encoder Value", leftMotorOne.getCurrentPosition());
+        telemetry.addData("Motor Port 3 Encoder Value", leftMotorTwo.getCurrentPosition());
+        telemetry.update();
     }
 
     @Override

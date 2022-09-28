@@ -5,9 +5,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 public class Constants {
     // _______________
     // ---  DRIVE  ---
-    public static final double ANGLE_TOLERANCE = 1;
-    public static final String LEFT_DRIVE = "left_drive";
-    public static final String RIGHT_DRIVE = "right_drive";
+    public static final double DRIVE_ANGLE_TOLERANCE = 1;
+    public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
+    public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
+    public static final double ENCODER_COUNTS_PER_REV = 25.9;
 
     // ________________
     // ---  SERVOS  ---
@@ -17,7 +18,7 @@ public class Constants {
     // ---  SENSOR  ---
     public static final String GYRO_NAME = "gyro";
     public static final String LOG_FILE_NAME = "gyro.log";
-    public static final String CALIBRATION_FILE_NAME = "file.file";
+    public static final String CALIBRATION_FILE_NAME = "gyro_calibration.log";
 
     public static final BNO055IMU.AccelUnit ACCEL_UNIT = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
     public static final BNO055IMU.AngleUnit ANGLE_UNIT = BNO055IMU.AngleUnit.DEGREES;

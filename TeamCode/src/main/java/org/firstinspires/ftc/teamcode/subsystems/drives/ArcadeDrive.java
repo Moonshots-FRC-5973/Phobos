@@ -8,14 +8,12 @@ import org.firstinspires.ftc.teamcode.Constants;
 public class ArcadeDrive {
     public DcMotor leftDrive;
     public DcMotor rightDrive;
-    private HardwareMap hardwareMap;
     private int check = 0;
     private double requestedRotation;
 
-    public void init(HardwareMap hardwareMap){
-        this.hardwareMap = hardwareMap;
-        leftDrive  = hardwareMap.get(DcMotor.class, Constants.LEFT_DRIVE);
-        rightDrive = hardwareMap.get(DcMotor.class, Constants.RIGHT_DRIVE);
+    public void init(HardwareMap hardwareMap) {
+        leftDrive  = hardwareMap.get(DcMotor.class, Constants.DRIVE_MOTOR_ONE_NAME);
+        rightDrive = hardwareMap.get(DcMotor.class, Constants.DRIVE_MOTOR_TWO_NAME);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -24,14 +22,14 @@ public class ArcadeDrive {
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void drive(double left, double right){
+    public void drive(double left, double right) {
         // Send calculated power to wheels
         leftDrive.setPower(left);
         rightDrive.setPower(right);
     }
 
-    public void turnToDegree(double angleDelta){
-
+    public void turnToDegree(double angleDelta) {
+        requestedRotation = angleDelta;
     }
 
     private double notReallyPID() {
@@ -50,7 +48,7 @@ public class ArcadeDrive {
 
         // are we there yet? this is to avoid ping-ponging
         // plus we never stop the method unless our output is zero
-        if(Math.abs(error) < Constants.ANGLE_TOLERANCE) check++;
+        if(Math.abs(error) < Constants.DRIVE_ANGLE_TOLERANCE) check++;
         if(check > ENOUGH_CHECKS) return 0.0;
 
         // determine the direction

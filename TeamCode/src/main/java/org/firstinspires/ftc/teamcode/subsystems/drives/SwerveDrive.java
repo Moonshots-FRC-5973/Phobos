@@ -13,4 +13,13 @@ public class SwerveDrive {
         leftMotorOne = hardwareMap.get(DcMotor.class, "left_drive_one");
         leftMotorOne = hardwareMap.get(DcMotor.class, "left_drive_two");
     }
+
+    public void init() {
+
+    }
+
+    public void stop() {
+        leftMotorOne.setPower(0.0d);
+        leftMotorTwo.setPower(0.0d);
+    }
 }
