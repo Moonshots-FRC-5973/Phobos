@@ -5,12 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.checkerframework.checker.units.qual.degrees;
+import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
+import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
+
 @TeleOp(name="Test Suite", group="TeleOp")
 public class TestSuite extends OpMode {
-    private DcMotor leftMotorOne;
-    private DcMotor leftMotorTwo;
-    private DcMotor rightMotorOne;
-    private DcMotor rightMotorTwo;
+    private SwerveDrive driveSystem;
 
     /**
      * User defined init method
@@ -19,10 +20,8 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void init() {
-        leftMotorOne = hardwareMap.get(DcMotor.class, "left_drive_one");
-        leftMotorTwo = hardwareMap.get(DcMotor.class, "left_drive_two");
-        //rightMotorOne = hardwareMap.get(DcMotor.class, "right_drive_one");
-        //rightMotorTwo = hardwareMap.get(DcMotor.class, "right_drive_two");
+        driveSystem = new SwerveDrive(hardwareMap);
+        driveSystem.makeRobotCentric();
         telemetry.addData("Status", "Initialized.");
     }
 
@@ -33,24 +32,21 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
-        leftMotorOne.setPower(Range.clip(
-                gamepad1.left_stick_y + gamepad1.left_stick_x,
-                -0.75,
-                0.75
-        ));
-        leftMotorTwo.setPower(Range.clip(
-                gamepad1.left_stick_y - gamepad1.left_stick_x,
-                -0.75,
-                0.75
-        ));
-        telemetry.addData("Motor Port 2 Encoder Value", leftMotorOne.getCurrentPosition());
-        telemetry.addData("Motor Port 3 Encoder Value", leftMotorTwo.getCurrentPosition());
-        telemetry.update();
+        driveSystem.drive(
+                new Vec2(
+                        gamepad1.left_stick_x,
+                        gamepad1.left_stick_y
+                ),
+                gamepad1.right_stick_x
+        );
+
+        if(gamepad1.a) {
+            driveSystem.switchMode();
+        }
     }
 
     @Override
     public void stop() {
-        leftMotorOne.setPower(0.0d);
-        leftMotorTwo.setPower(0.0d);
+        driveSystem.stop();
     }
 }
