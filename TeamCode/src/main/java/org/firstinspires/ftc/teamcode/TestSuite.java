@@ -32,7 +32,7 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
-        driveSystem.drive(
+        drive(
                 new Vec2(
                         gamepad1.left_stick_x,
                         gamepad1.left_stick_y
@@ -43,10 +43,84 @@ public class TestSuite extends OpMode {
         if(gamepad1.a) {
             driveSystem.switchMode();
         }
+
+        if(gamepad1.b) {
+            driveSystem.resetWheels();
+        }
+
+        telemetry.update();
     }
 
     @Override
     public void stop() {
         driveSystem.stop();
+    }
+
+    public void drive(Vec2 movement, double turn) {
+        if(Math.abs(movement.getX()) <= Constants.INPUT_THRESHOLD) {
+            movement.setX(0.0d);
+        }
+
+        if(Math.abs(movement.getY()) <= Constants.INPUT_THRESHOLD) {
+            movement.setY(0.0d);
+        }
+
+        if(Math.abs(turn) <= Constants.INPUT_THRESHOLD) {
+            turn = 0.0d;
+        }
+
+        telemetry.addData("Left Motor 1 Encoder Value", driveSystem.leftMotorOne.getCurrentPosition());
+        telemetry.addData("Left Motor 2 Encoder Value", driveSystem.leftMotorTwo.getCurrentPosition());
+
+        if(driveSystem.isFieldCentric()) {
+            telemetry.addData("DriveMode","Field Centric");
+            double angle = Math.atan2(movement.getX(), movement.getY());
+            angle *= Constants.ENCODER_COUNTS_PER_RADIAN;
+            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) ;
+            telemetry.addData("Args", "Power %f, Encoder Target %f", power, angle);
+            telemetry.addData("Left Motor 1 Power",
+                    power * (driveSystem.leftMotorOne.getCurrentPosition() - angle));
+            telemetry.addData("Left Motor 2 Power",
+                    power * (angle - driveSystem.leftMotorTwo.getCurrentPosition()));
+            /*
+            driveSystem.drive(
+                    Range.clip(
+                            power * (driveSystem.leftMotorOne.getCurrentPosition() - angle),
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    Range.clip(
+                            power * (angle - driveSystem.leftMotorTwo.getCurrentPosition()),
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    0.0d,
+                    0.0d
+            );
+
+             */
+        } else {
+            driveSystem.drive(
+                    Range.clip(
+                            movement.getY() + turn,
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    Range.clip(
+                            movement.getY() - turn,
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    Range.clip(
+                            movement.getY() + turn,
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED),
+                    Range.clip(
+                            movement.getY() - turn,
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    )
+            );
+        }
     }
 }

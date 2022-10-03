@@ -6,25 +6,33 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.Gyro;
 import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
+import org.firstinspires.ftc.teamcode.wrappers.IMU;
 
 public class SwerveDrive {
-    private DcMotor leftMotorOne;
-    private DcMotor leftMotorTwo;
+    public DcMotor leftMotorOne;
+    public DcMotor leftMotorTwo;
     private DcMotor rightMotorOne;
     private DcMotor rightMotorTwo;
-    private boolean isFieldCentric = true;
+    private boolean fieldCentric = true;
+
+    private IMU imu;
 
     public void makeFieldCentric() {
-        isFieldCentric = true;
+        fieldCentric = true;
     }
 
     public void makeRobotCentric() {
-        isFieldCentric = false;
+        fieldCentric = false;
     }
 
     public void switchMode() {
-        isFieldCentric = !isFieldCentric;
+        fieldCentric = !fieldCentric;
+    }
+
+    public boolean isFieldCentric() {
+        return fieldCentric;
     }
 
     public SwerveDrive(HardwareMap hardwareMap) {
@@ -41,6 +49,7 @@ public class SwerveDrive {
         rightMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */
 
+        imu = new IMU(hardwareMap);
     }
 
     public void init() {
@@ -64,7 +73,25 @@ public class SwerveDrive {
             turn = 0.0d;
         }
 
-        if(isFieldCentric) {
+        if(fieldCentric) {
+            double angle = Math.atan2(movement.getX(), movement.getY());
+            angle *= Constants.ENCODER_COUNTS_PER_RADIAN;
+            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) ;
+
+            drive(
+                    Range.clip(
+                            power * (leftMotorOne.getCurrentPosition() - angle),
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    Range.clip(
+                            power * (angle - leftMotorTwo.getCurrentPosition()),
+                            -Constants.MOTOR_MAX_SPEED,
+                            Constants.MOTOR_MAX_SPEED
+                    ),
+                    0.0d,
+                    0.0d
+            );
         } else {
             drive(
                     Range.clip(
@@ -99,6 +126,24 @@ public class SwerveDrive {
         leftMotorTwo.setPower(p2);
         //rightMotorOne.setPower(p3);
         //rightMotorTwo.setPower(p4);
+    }
+
+    public void resetWheels() {
+        leftMotorOne.setPower(
+                Range.clip(
+                        -leftMotorOne.getCurrentPosition() / 100,
+                        -Constants.MOTOR_MAX_SPEED,
+                        Constants.MOTOR_MAX_SPEED
+                )
+        );
+
+        leftMotorTwo.setPower(
+                Range.clip(
+                        -leftMotorTwo.getCurrentPosition() / 100,
+                        -Constants.MOTOR_MAX_SPEED,
+                        Constants.MOTOR_MAX_SPEED
+                )
+        );
     }
 
     public void stop() {

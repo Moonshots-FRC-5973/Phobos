@@ -9,6 +9,7 @@ public class Constants {
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
     public static final double ENCODER_COUNTS_PER_REV = 25.9;
+    public static final double ENCODER_COUNTS_PER_RADIAN = ENCODER_COUNTS_PER_REV / (180 / Math.PI);
     public static final double INPUT_THRESHOLD = 0.15;
     public static final double MOTOR_MAX_SPEED = 0.75;
 
@@ -18,7 +19,7 @@ public class Constants {
 
     // ________________
     // ---  SENSOR  ---
-    public static final String GYRO_NAME = "gyro";
+    public static final String GYRO_NAME = "imu";
     public static final String LOG_FILE_NAME = "gyro.log";
     public static final String CALIBRATION_FILE_NAME = "gyro_calibration.log";
 

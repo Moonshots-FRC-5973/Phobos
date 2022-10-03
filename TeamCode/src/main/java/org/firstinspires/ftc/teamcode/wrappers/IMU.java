@@ -70,7 +70,7 @@ public class IMU {
      * @return The X axis velocity of the control panel.
      */
     public double getXVelocity() {
-        return (double)(imu.getVelocity().xVeloc);
+        return imu.getVelocity().xVeloc;
     }
 
     /**
@@ -78,7 +78,7 @@ public class IMU {
      * @return The Y axis velocity of the control panel.
      */
     public double getYVelocity() {
-        return (double)(imu.getVelocity().yVeloc);
+        return imu.getVelocity().yVeloc;
     }
 
     /**
@@ -86,7 +86,7 @@ public class IMU {
      * @return The Z axis velocity of the control panel.
      */
     public double getZVelocity() {
-        return (double)(imu.getVelocity().zVeloc);
+        return imu.getVelocity().zVeloc;
     }
 
     /**
