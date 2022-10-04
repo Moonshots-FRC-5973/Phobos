@@ -46,7 +46,6 @@ public class SwerveDrive {
         /*
         rightMotorOne = hardwareMap.get(DcMotor.class, "right_drive_one");
         rightMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         rightMotorTwo = hardwareMap.get(DcMotor.class, "right_drive_two");
         rightMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */
