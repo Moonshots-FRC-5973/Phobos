@@ -72,17 +72,31 @@ public class TestSuite extends OpMode {
         telemetry.addData("Left Motor 1 Encoder Value", driveSystem.leftMotorOne.getCurrentPosition());
         telemetry.addData("Left Motor 2 Encoder Value", driveSystem.leftMotorTwo.getCurrentPosition());
 
+        double encoderDiff =
+                driveSystem.leftMotorOne.getCurrentPosition() -
+                        driveSystem.leftMotorTwo.getCurrentPosition();
+        telemetry.addData("Encoder Difference", encoderDiff);
+        double wheelAngle = (encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360;
+        telemetry.addData("Wheel Angle", wheelAngle);
+
         if(driveSystem.isFieldCentric()) {
             telemetry.addData("DriveMode","Field Centric");
             double angle = Math.atan2(movement.getX(), movement.getY());
-            angle *= Constants.ENCODER_COUNTS_PER_RADIAN;
+            angle *= 180 / Math.PI;
             double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) ;
             telemetry.addData("Args", "Power %f, Encoder Target %f", power, angle);
-            telemetry.addData("Left Motor 1 Power",
-                    power * (driveSystem.leftMotorOne.getCurrentPosition() - angle));
-            telemetry.addData("Left Motor 2 Power",
-                    power * (angle - driveSystem.leftMotorTwo.getCurrentPosition()));
+            double angleDiff;
+            if(angle >= 0) {
+                angleDiff = angle - wheelAngle;
+            } else {
+                angleDiff = wheelAngle + angle;
+            }
             /*
+            telemetry.addData("Left Motor 1 Power",
+                    power * ((driveSystem.leftMotorOne.getCurrentPosition() % Constants.ENCODER_COUNTS_PER_REV) - angle) / 10);
+            telemetry.addData("Left Motor 2 Power",
+                    power * (angle - (driveSystem.leftMotorTwo.getCurrentPosition() % Constants.ENCODER_COUNTS_PER_REV)) / 10);
+
             driveSystem.drive(
                     Range.clip(
                             power * (driveSystem.leftMotorOne.getCurrentPosition() - angle),
@@ -99,6 +113,9 @@ public class TestSuite extends OpMode {
             );
 
              */
+
+
+
         } else {
             driveSystem.drive(
                     Range.clip(
