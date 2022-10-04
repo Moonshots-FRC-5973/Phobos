@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.checkerframework.checker.units.qual.degrees;
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
 
@@ -32,7 +33,7 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
-        drive(
+        driveSystem.drive(
                 new Vec2(
                         gamepad1.left_stick_x,
                         gamepad1.left_stick_y
@@ -83,39 +84,20 @@ public class TestSuite extends OpMode {
             telemetry.addData("DriveMode","Field Centric");
             double angle = Math.atan2(movement.getX(), movement.getY());
             angle *= 180 / Math.PI;
-            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) ;
+            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));
             telemetry.addData("Args", "Power %f, Encoder Target %f", power, angle);
-            double angleDiff;
-            if(angle >= 0) {
-                angleDiff = angle - wheelAngle;
-            } else {
-                angleDiff = wheelAngle + angle;
-            }
-            /*
-            telemetry.addData("Left Motor 1 Power",
-                    power * ((driveSystem.leftMotorOne.getCurrentPosition() % Constants.ENCODER_COUNTS_PER_REV) - angle) / 10);
-            telemetry.addData("Left Motor 2 Power",
-                    power * (angle - (driveSystem.leftMotorTwo.getCurrentPosition() % Constants.ENCODER_COUNTS_PER_REV)) / 10);
+            double angleDiff = angle - wheelAngle;
+            telemetry.addData("Wheel angle Change Needed", angleDiff);
+            double m1Power = power + (angleDiff / 10);
+            telemetry.addData("Left Motor 1 Power", m1Power);
+            double m2Power = power - (angleDiff / 10);
+            telemetry.addData("Left Motor 2 Power", m2Power);
 
-            driveSystem.drive(
-                    Range.clip(
-                            power * (driveSystem.leftMotorOne.getCurrentPosition() - angle),
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            power * (angle - driveSystem.leftMotorTwo.getCurrentPosition()),
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    0.0d,
-                    0.0d
-            );
-
-             */
-
-
-
+            driveSystem.drive(Range.clip(
+                    m1Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
+            ), Range.clip(
+                    m2Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
+            ), 0.0d, 0.0d);
         } else {
             driveSystem.drive(
                     Range.clip(

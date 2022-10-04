@@ -74,24 +74,20 @@ public class SwerveDrive {
         }
 
         if(fieldCentric) {
-            double angle = Math.atan2(movement.getX(), movement.getY());
-            angle *= Constants.ENCODER_COUNTS_PER_RADIAN;
-            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) ;
+            double encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
+            double wheelAngle = (encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360;
 
-            drive(
-                    Range.clip(
-                            power * (leftMotorOne.getCurrentPosition() - angle),
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            power * (angle - leftMotorTwo.getCurrentPosition()),
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    0.0d,
-                    0.0d
-            );
+            double angle = (Math.atan2(movement.getX(), movement.getY()) * 180) / Math.PI;
+            double m1Power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) +
+                    ((angle - wheelAngle) / 10);
+            double m2Power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) -
+                    ((angle - wheelAngle) / 10);
+
+            drive(Range.clip(
+                    m1Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
+            ), Range.clip(
+                    m2Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
+            ), 0.0d, 0.0d);
         } else {
             drive(
                     Range.clip(
