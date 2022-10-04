@@ -37,9 +37,11 @@ public class SwerveDrive {
 
     public SwerveDrive(HardwareMap hardwareMap) {
         leftMotorOne = hardwareMap.get(DcMotor.class, "left_drive_one");
+        leftMotorOne.resetDeviceConfigurationForOpMode();
         leftMotorOne.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftMotorTwo = hardwareMap.get(DcMotor.class, "left_drive_two");
+        leftMotorTwo.resetDeviceConfigurationForOpMode();
         leftMotorTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         /*
         rightMotorOne = hardwareMap.get(DcMotor.class, "right_drive_one");
@@ -48,7 +50,6 @@ public class SwerveDrive {
         rightMotorTwo = hardwareMap.get(DcMotor.class, "right_drive_two");
         rightMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */
-
         imu = new IMU(hardwareMap);
     }
 
