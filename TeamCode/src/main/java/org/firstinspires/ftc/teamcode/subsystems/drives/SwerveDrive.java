@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.sensors.Gyro;
 import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
@@ -18,6 +17,10 @@ public class SwerveDrive {
     private boolean fieldCentric = true;
 
     private IMU imu;
+
+    public int getLeftEncodersDifference() {
+        return leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
+    }
 
     public void makeFieldCentric() {
         fieldCentric = true;
@@ -74,14 +77,14 @@ public class SwerveDrive {
         }
 
         if(fieldCentric) {
-            double encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
+            int encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
             double wheelAngle = (encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360;
-
+            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));
             double angle = (Math.atan2(movement.getX(), movement.getY()) * 180) / Math.PI;
-            double m1Power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) +
-                    ((angle - wheelAngle) / 10);
-            double m2Power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2)) -
-                    ((angle - wheelAngle) / 10);
+            double m1Power = ((angle - wheelAngle) / 10);
+            double m2Power = - ((angle - wheelAngle) / 10);
+            m1Power *= power;
+            m2Power *= power;
 
             drive(Range.clip(
                     m1Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
