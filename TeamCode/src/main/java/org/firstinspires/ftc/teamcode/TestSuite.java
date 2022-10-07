@@ -62,45 +62,38 @@ public class TestSuite extends OpMode {
                 -Constants.MOTOR_MAX_SPEED,
                 Constants.MOTOR_MAX_SPEED
         );
-        double wheelAngle = driveSystem.leftMotorOne.getCurrentPosition() - driveSystem.leftMotorTwo.getCurrentPosition();
-        wheelAngle /= Constants.ENCODER_COUNTS_PER_REV;
-        wheelAngle *= 360;
-        wheelAngle %= 360;
-        wheelAngle -= 180;
-        double targetAngle = Math.toDegrees(Math.atan2(strafe, forward));
-        double rotationPower = (((targetAngle / 2) - (wheelAngle / 2)) / 180);
-        rotationPower *= 3;
-        rotationPower /= 2;
+
+        // Value (-360, 360)
+        double wheelAngle = 360 * ((driveSystem.getLeftEncodersDifference() % Constants.ENCODER_COUNTS_PER_REV) / Constants.ENCODER_COUNTS_PER_REV);
+        if(wheelAngle < 0)
+            wheelAngle = 360 - wheelAngle; // [0, 360)
+
+        double targetAngle = Math.atan2(forward, strafe); // (-180, 180]
+
+        targetAngle += 180; // (0, 360]
+
+        double angleDiff = targetAngle - wheelAngle;
+        double rotationPower = (-Math.pow(angleDiff, 2) + (180 * angleDiff)) / Math.pow(90, 2);
 
         double m1Power, m2Power, m3Power, m4Power;
-        /*
+
         if(targetAngle <= wheelAngle + 90 && targetAngle > wheelAngle) {
             // Q1
-            m1Power = forward + turn + rotationPower;
-            m2Power = forward + turn - rotationPower;
-            m3Power = forward - turn + rotationPower;
-            m4Power = forward - turn - rotationPower;
+            telemetry.addData("Quadrant", "1");
         } else if(targetAngle <= wheelAngle + 180 && targetAngle >= wheelAngle + 90) {
             // Q2
-            m1Power = -forward + turn + rotationPower;
-            m2Power = -forward + turn - rotationPower;
-            m3Power = -forward - turn + rotationPower;
-            m4Power = -forward - turn - rotationPower;
+            telemetry.addData("Quadrant", "2");
+            staticPower *= -1;
+            rotationPower *= -1;
         } else if(targetAngle < wheelAngle - 90 && targetAngle >= wheelAngle - 180) {
             // Q3
-            m1Power = -forward + turn - rotationPower;
-            m2Power = -forward + turn + rotationPower;
-            m3Power = -forward - turn - rotationPower;
-            m4Power = -forward - turn + rotationPower;
+            telemetry.addData("Quadrant", "3");
+            staticPower *= -1;
         } else {
             // Q4
-            m1Power = forward + turn - rotationPower;
-            m2Power = forward + turn + rotationPower;
-            m3Power = forward - turn - rotationPower;
-            m4Power = forward - turn + rotationPower;
+            telemetry.addData("Quadrant", "4");
+            rotationPower *= -1;
         }
-
-         */
 
         m1Power = staticPower + rotationPower + turn;
         m2Power = staticPower - rotationPower + turn;
