@@ -33,11 +33,9 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
-        driveSystem.drive(
-                new Vec2(
-                        gamepad1.left_stick_x,
-                        gamepad1.left_stick_y
-                ),
+        drive(
+                -gamepad1.left_stick_y,
+                gamepad1.left_stick_x,
                 gamepad1.right_stick_x
         );
 
@@ -57,69 +55,70 @@ public class TestSuite extends OpMode {
         driveSystem.stop();
     }
 
-    public void drive(Vec2 movement, double turn) {
-        if(Math.abs(movement.getX()) <= Constants.INPUT_THRESHOLD) {
-            movement.setX(0.0d);
-        }
+    private void drive(double forward, double strafe, double turn) {
+        telemetry.addData("Inputs", String.format("%f, %f, %f", forward, strafe, turn));
+        double staticPower = Range.clip(
+                Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2) + Math.pow(turn, 2)),
+                -Constants.MOTOR_MAX_SPEED,
+                Constants.MOTOR_MAX_SPEED
+        );
+        double wheelAngle = driveSystem.leftMotorOne.getCurrentPosition() - driveSystem.leftMotorTwo.getCurrentPosition();
+        wheelAngle /= Constants.ENCODER_COUNTS_PER_REV;
+        wheelAngle *= 360;
+        wheelAngle %= 360;
+        wheelAngle -= 180;
+        double targetAngle = Math.toDegrees(Math.atan2(strafe, forward));
+        double rotationPower = (((targetAngle / 2) - (wheelAngle / 2)) / 180);
+        rotationPower *= 3;
+        rotationPower /= 2;
 
-        if(Math.abs(movement.getY()) <= Constants.INPUT_THRESHOLD) {
-            movement.setY(0.0d);
-        }
-
-        if(Math.abs(turn) <= Constants.INPUT_THRESHOLD) {
-            turn = 0.0d;
-        }
-
-        telemetry.addData("Left Motor 1 Encoder Value", driveSystem.leftMotorOne.getCurrentPosition());
-        telemetry.addData("Left Motor 2 Encoder Value", driveSystem.leftMotorTwo.getCurrentPosition());
-
-        double encoderDiff =
-                driveSystem.leftMotorOne.getCurrentPosition() -
-                        driveSystem.leftMotorTwo.getCurrentPosition();
-        telemetry.addData("Encoder Difference", encoderDiff);
-        double wheelAngle = (encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360;
-        telemetry.addData("Wheel Angle", wheelAngle);
-
-        if(driveSystem.isFieldCentric()) {
-            telemetry.addData("DriveMode","Field Centric");
-            double angle = Math.atan2(movement.getX(), movement.getY());
-            angle *= 180 / Math.PI;
-            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));
-            telemetry.addData("Args", "Power %f, Encoder Target %f", power, angle);
-            double angleDiff = angle - wheelAngle;
-            telemetry.addData("Wheel angle Change Needed", angleDiff);
-            double m1Power = power + (angleDiff / 10);
-            telemetry.addData("Left Motor 1 Power", m1Power);
-            double m2Power = power - (angleDiff / 10);
-            telemetry.addData("Left Motor 2 Power", m2Power);
-
-            driveSystem.drive(Range.clip(
-                    m1Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
-            ), Range.clip(
-                    m2Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
-            ), 0.0d, 0.0d);
+        double m1Power, m2Power, m3Power, m4Power;
+        /*
+        if(targetAngle <= wheelAngle + 90 && targetAngle > wheelAngle) {
+            // Q1
+            m1Power = forward + turn + rotationPower;
+            m2Power = forward + turn - rotationPower;
+            m3Power = forward - turn + rotationPower;
+            m4Power = forward - turn - rotationPower;
+        } else if(targetAngle <= wheelAngle + 180 && targetAngle >= wheelAngle + 90) {
+            // Q2
+            m1Power = -forward + turn + rotationPower;
+            m2Power = -forward + turn - rotationPower;
+            m3Power = -forward - turn + rotationPower;
+            m4Power = -forward - turn - rotationPower;
+        } else if(targetAngle < wheelAngle - 90 && targetAngle >= wheelAngle - 180) {
+            // Q3
+            m1Power = -forward + turn - rotationPower;
+            m2Power = -forward + turn + rotationPower;
+            m3Power = -forward - turn - rotationPower;
+            m4Power = -forward - turn + rotationPower;
         } else {
-            driveSystem.drive(
-                    Range.clip(
-                            movement.getY() + turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            movement.getY() - turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            movement.getY() + turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED),
-                    Range.clip(
-                            movement.getY() - turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    )
-            );
+            // Q4
+            m1Power = forward + turn - rotationPower;
+            m2Power = forward + turn + rotationPower;
+            m3Power = forward - turn - rotationPower;
+            m4Power = forward - turn + rotationPower;
         }
+
+         */
+
+        m1Power = staticPower + rotationPower + turn;
+        m2Power = staticPower - rotationPower + turn;
+        m3Power = staticPower + rotationPower - turn;
+        m4Power = staticPower - rotationPower - turn;
+
+        m1Power = Range.clip(m1Power, -staticPower, staticPower);
+        m2Power = Range.clip(m2Power, -staticPower, staticPower);
+        m3Power = Range.clip(m3Power, -staticPower, staticPower);
+        m4Power = Range.clip(m4Power, -staticPower, staticPower);
+
+        telemetry.addData("Static Power", staticPower);
+        telemetry.addData("Rotation Power", rotationPower);
+        telemetry.addData("Wheel Angle", wheelAngle);
+        telemetry.addData("Target Angle", targetAngle);
+        telemetry.addData("Motor Powers", String.format("%f, %f, %f, %f",
+                m1Power, m2Power, m3Power, m4Power
+        ));
+        driveSystem.drive(m1Power, m2Power, m3Power, m4Power);
     }
 }

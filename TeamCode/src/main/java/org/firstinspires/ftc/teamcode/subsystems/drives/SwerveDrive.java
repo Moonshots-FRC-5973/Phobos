@@ -77,12 +77,12 @@ public class SwerveDrive {
         }
 
         if(fieldCentric) {
-            int encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
-            double wheelAngle = (encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360;
-            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));
-            double angle = (Math.atan2(movement.getX(), movement.getY()) * 180) / Math.PI;
-            double m1Power = ((angle - wheelAngle) / 10);
-            double m2Power = - ((angle - wheelAngle) / 10);
+            int encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();    // -inf -> inf
+            double wheelAngle = ((encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360) % 180;         // -179 -> 179
+            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));      // 0    -> sqrt(2)
+            double angle = (Math.atan2(movement.getX(), movement.getY()) * 180) / Math.PI;              // -179 -> 180
+            double m1Power = 0.5 + ((angle - wheelAngle) / 10);
+            double m2Power = (0.5 - (angle - wheelAngle) / 10);
             m1Power *= power;
             m2Power *= power;
 
