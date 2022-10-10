@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
 @TeleOp(name="Test Suite", group="TeleOp")
 public class TestSuite extends OpMode {
     private SwerveDrive driveSystem;
+    private boolean movingToAngle = false;
+    private double targetAngle = 0;
 
     /**
      * User defined init method
@@ -24,6 +26,8 @@ public class TestSuite extends OpMode {
         driveSystem = new SwerveDrive(hardwareMap);
         driveSystem.makeRobotCentric();
         telemetry.addData("Status", "Initialized.");
+        targetAngle = 180;
+        movingToAngle = true;
     }
 
     /**
@@ -33,20 +37,42 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
+        /*
         drive(
                 gamepad1.left_stick_y,
                 gamepad1.left_stick_x,
                 gamepad1.right_stick_x
         );
 
+         */
+
         if(gamepad1.a) {
-            driveSystem.switchMode();
+            movingToAngle = true;
+            targetAngle = 180;
         }
 
         if(gamepad1.b) {
-            driveSystem.resetWheels();
+            movingToAngle = true;
+            targetAngle = 90;
         }
 
+        if(gamepad1.y) {
+            movingToAngle = true;
+            targetAngle = 0;
+        }
+
+        if(gamepad1.x) {
+            movingToAngle = true;
+            targetAngle = 270;
+        }
+
+        if(movingToAngle) {
+            turnToAngle();
+        }
+
+
+
+        telemetry.addData("Left Angle Difference", driveSystem.getLeftEncodersDifference());
         telemetry.update();
     }
 
@@ -72,6 +98,18 @@ public class TestSuite extends OpMode {
         telemetry.addData("Right Wheel Angle", rightWheelAngle);
 
         double targetAngle = Math.toDegrees(Math.atan2(strafe, forward));
+        telemetry.addData("Target Angle", targetAngle);
+        double leftAngleDiff = targetAngle - leftWheelAngle;
+        telemetry.addData("Left Angle Diff", leftAngleDiff);
+        double leftRotationPower = Math.abs(Math.sin(Math.toRadians(leftAngleDiff)));
+        telemetry.addData("Left Rotation Power", leftRotationPower);
+
+        if(leftAngleDiff <= 0 && leftAngleDiff <= 90) {
+            telemetry.addData("Quadrant", 1);
+        } else if(leftAngleDiff <= 90 && leftAngleDiff <= 180) {
+            telemetry.addData("Quadrant", 2);
+        }
+
         /*
 
         double targetAngle = Math.toDegrees(Math.atan2(strafe, forward)); // (-180, 180]
@@ -122,7 +160,21 @@ public class TestSuite extends OpMode {
         //driveSystem.drive(m1Power, m2Power, m3Power, m4Power);
     }
 
-    private double scale(double num, double smin, double smax, double fmin, double fmax) {
-        return ((fmax - fmin) * ((num - smin) / (smax - smin))) + fmin;
+    private void turnToAngle() {
+        double leftWheelAngle = (360 * (driveSystem.getLeftEncodersDifference() / Constants.ENCODER_COUNTS_PER_REV)) % 360;
+        telemetry.addData("Left Wheel Angle", leftWheelAngle);
+
+
+        double leftAngleDiff = targetAngle - leftWheelAngle;
+        telemetry.addData("Left Angle Diff", leftAngleDiff);
+        double leftRotationPower = .1; //Math.abs(Math.sin(Math.toRadians(leftAngleDiff)));
+
+        if(Math.abs(leftAngleDiff) <= 2) {
+            driveSystem.stop();
+            movingToAngle = false;
+        } else
+            driveSystem.drive(leftRotationPower, -leftRotationPower, 0.0d, 0.0d);
+
+
     }
 }
