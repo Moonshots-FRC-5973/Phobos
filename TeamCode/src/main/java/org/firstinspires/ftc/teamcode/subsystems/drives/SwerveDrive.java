@@ -22,6 +22,10 @@ public class SwerveDrive {
         return leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
     }
 
+    public int getRightEncodersDifference() {
+        return rightMotorOne.getCurrentPosition() - rightMotorTwo.getCurrentPosition();
+    }
+
     public void makeFieldCentric() {
         fieldCentric = true;
     }
@@ -46,12 +50,12 @@ public class SwerveDrive {
         leftMotorTwo = hardwareMap.get(DcMotor.class, "left_drive_two");
         leftMotorTwo.resetDeviceConfigurationForOpMode();
         leftMotorTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        /*
+
         rightMotorOne = hardwareMap.get(DcMotor.class, "right_drive_one");
-        rightMotorOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotorOne.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotorTwo = hardwareMap.get(DcMotor.class, "right_drive_two");
-        rightMotorTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        */
+        rightMotorTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         imu = new IMU(hardwareMap);
     }
 
@@ -123,8 +127,8 @@ public class SwerveDrive {
     public void drive(double p1, double p2, double p3, double p4) {
         leftMotorOne.setPower(p1);
         leftMotorTwo.setPower(p2);
-        //rightMotorOne.setPower(p3);
-        //rightMotorTwo.setPower(p4);
+        rightMotorOne.setPower(p3);
+        rightMotorTwo.setPower(p4);
     }
 
     public void resetWheels() {
@@ -143,12 +147,28 @@ public class SwerveDrive {
                         Constants.MOTOR_MAX_SPEED
                 )
         );
+
+        rightMotorOne.setPower(
+                Range.clip(
+                        -rightMotorOne.getCurrentPosition() / 100,
+                        -Constants.MOTOR_MAX_SPEED,
+                        Constants.MOTOR_MAX_SPEED
+                )
+        );
+
+        rightMotorTwo.setPower(
+                Range.clip(
+                        -rightMotorTwo.getCurrentPosition() / 100,
+                        -Constants.MOTOR_MAX_SPEED,
+                        Constants.MOTOR_MAX_SPEED
+                )
+        );
     }
 
     public void stop() {
         leftMotorOne.setPower(0.0d);
         leftMotorTwo.setPower(0.0d);
-        //rightMotorOne.setPower(0.0d);
-        //rightMotorTwo.setPower(0.0d);
+        rightMotorOne.setPower(0.0d);
+        rightMotorTwo.setPower(0.0d);
     }
 }

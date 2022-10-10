@@ -34,7 +34,7 @@ public class TestSuite extends OpMode {
     @Override
     public void loop() {
         drive(
-                -gamepad1.left_stick_y,
+                gamepad1.left_stick_y,
                 gamepad1.left_stick_x,
                 gamepad1.right_stick_x
         );
@@ -62,20 +62,25 @@ public class TestSuite extends OpMode {
                 -Constants.MOTOR_MAX_SPEED,
                 Constants.MOTOR_MAX_SPEED
         );
+        telemetry.addData("Static Power", staticPower);
 
-        // Value (-360, 360)
-        double wheelAngle = 360 * ((driveSystem.getLeftEncodersDifference() % Constants.ENCODER_COUNTS_PER_REV) / Constants.ENCODER_COUNTS_PER_REV);
-        if(wheelAngle < 0)
-            wheelAngle = 360 - wheelAngle; // [0, 360)
+        double m1Power, m2Power, m3Power, m4Power;
 
-        double targetAngle = Math.atan2(forward, strafe); // (-180, 180]
+        double leftWheelAngle = (360 * (driveSystem.getLeftEncodersDifference() / Constants.ENCODER_COUNTS_PER_REV)) % 360;
+        telemetry.addData("Left Wheel Angle", leftWheelAngle);
+        double rightWheelAngle = (360 * (driveSystem.getRightEncodersDifference() / Constants.ENCODER_COUNTS_PER_REV)) % 360;
+        telemetry.addData("Right Wheel Angle", rightWheelAngle);
+
+        double targetAngle = Math.toDegrees(Math.atan2(strafe, forward));
+        /*
+
+        double targetAngle = Math.toDegrees(Math.atan2(strafe, forward)); // (-180, 180]
 
         targetAngle += 180; // (0, 360]
 
         double angleDiff = targetAngle - wheelAngle;
-        double rotationPower = (-Math.pow(angleDiff, 2) + (180 * angleDiff)) / Math.pow(90, 2);
+        double rotationPower = Math.abs(Math.sin(Math.toRadians(angleDiff)));
 
-        double m1Power, m2Power, m3Power, m4Power;
 
         if(targetAngle <= wheelAngle + 90 && targetAngle > wheelAngle) {
             // Q1
@@ -85,7 +90,7 @@ public class TestSuite extends OpMode {
             telemetry.addData("Quadrant", "2");
             staticPower *= -1;
             rotationPower *= -1;
-        } else if(targetAngle < wheelAngle - 90 && targetAngle >= wheelAngle - 180) {
+        } else if(targetAngle < wheelAngle + 270 && targetAngle >= wheelAngle + 180) {
             // Q3
             telemetry.addData("Quadrant", "3");
             staticPower *= -1;
@@ -100,10 +105,10 @@ public class TestSuite extends OpMode {
         m3Power = staticPower + rotationPower - turn;
         m4Power = staticPower - rotationPower - turn;
 
-        m1Power = Range.clip(m1Power, -staticPower, staticPower);
-        m2Power = Range.clip(m2Power, -staticPower, staticPower);
-        m3Power = Range.clip(m3Power, -staticPower, staticPower);
-        m4Power = Range.clip(m4Power, -staticPower, staticPower);
+        m1Power = scale(m1Power, -3, 3, -staticPower, staticPower);
+        m2Power = scale(m2Power, -3, 3, -staticPower, staticPower);
+        m3Power = scale(m3Power, -3, 3, -staticPower, staticPower);
+        m4Power = scale(m4Power, -3, 3, -staticPower, staticPower);
 
         telemetry.addData("Static Power", staticPower);
         telemetry.addData("Rotation Power", rotationPower);
@@ -112,6 +117,12 @@ public class TestSuite extends OpMode {
         telemetry.addData("Motor Powers", String.format("%f, %f, %f, %f",
                 m1Power, m2Power, m3Power, m4Power
         ));
-        driveSystem.drive(m1Power, m2Power, m3Power, m4Power);
+
+         */
+        //driveSystem.drive(m1Power, m2Power, m3Power, m4Power);
+    }
+
+    private double scale(double num, double smin, double smax, double fmin, double fmax) {
+        return ((fmax - fmin) * ((num - smin) / (smax - smin))) + fmin;
     }
 }
