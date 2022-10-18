@@ -167,7 +167,7 @@ public class TestSuite extends OpMode {
 
         double leftAngleDiff = targetAngle - leftWheelAngle;
         telemetry.addData("Left Angle Diff", leftAngleDiff);
-        double leftRotationPower = .1; //Math.abs(Math.sin(Math.toRadians(leftAngleDiff)));
+        double leftRotationPower = Math.sin(Math.toRadians(leftAngleDiff)) / 2;
 
         if(Math.abs(leftAngleDiff) <= 2) {
             driveSystem.stop();

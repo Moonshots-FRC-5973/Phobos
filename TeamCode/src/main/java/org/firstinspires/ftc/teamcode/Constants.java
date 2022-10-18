@@ -8,7 +8,7 @@ public class Constants {
     public static final double DRIVE_ANGLE_TOLERANCE = 1;
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
-    public static final double ENCODER_COUNTS_PER_REV = 2000;
+    public static final double ENCODER_COUNTS_PER_REV = 2047.136;
     public static final double INPUT_THRESHOLD = 0.15;
     public static final double MOTOR_MAX_SPEED = 0.75;
 
