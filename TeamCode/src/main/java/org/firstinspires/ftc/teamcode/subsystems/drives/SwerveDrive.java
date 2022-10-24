@@ -128,7 +128,7 @@ public class SwerveDrive {
         double leftWheelDiff = getLeftWheelAngle() - target;
         double rightWheelDiff = getRightWheelAngle() - target;
 
-        
+
     }
 
     public void resetWheels() {
