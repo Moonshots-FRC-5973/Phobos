@@ -4,16 +4,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.sensors.Gyro;
 import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
 import org.firstinspires.ftc.teamcode.wrappers.IMU;
 
 public class SwerveDrive {
-    public DcMotor leftMotorOne;
-    public DcMotor leftMotorTwo;
+    private DcMotor leftMotorOne;
+    private DcMotor leftMotorTwo;
     private DcMotor rightMotorOne;
     private DcMotor rightMotorTwo;
+    private double speed = 1;
     private boolean fieldCentric = true;
 
     private IMU imu;
@@ -21,9 +22,24 @@ public class SwerveDrive {
     public int getLeftEncodersDifference() {
         return leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();
     }
-
+    public double getLeftWheelAngle() {
+        double angle = (360 * (getLeftEncodersDifference() % Constants.DRIVE_ENCODER_COUNTS_PER_REV) / Constants.DRIVE_ENCODER_COUNTS_PER_REV);
+        if(fieldCentric) return angle + imu.getZAngle();
+        return angle;
+    }
     public int getRightEncodersDifference() {
         return rightMotorOne.getCurrentPosition() - rightMotorTwo.getCurrentPosition();
+    }
+    public double getRightWheelAngle() {
+        double angle =  (360 * (getRightEncodersDifference() % Constants.DRIVE_ENCODER_COUNTS_PER_REV) / Constants.DRIVE_ENCODER_COUNTS_PER_REV);
+        if(fieldCentric) return angle + imu.getZAngle();
+        return angle;
+    }
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+    public double getSpeed() {
+        return speed;
     }
 
     public void makeFieldCentric() {
@@ -45,83 +61,60 @@ public class SwerveDrive {
     public SwerveDrive(HardwareMap hardwareMap) {
         leftMotorOne = hardwareMap.get(DcMotor.class, "left_drive_one");
         leftMotorOne.resetDeviceConfigurationForOpMode();
-        leftMotorOne.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftMotorTwo = hardwareMap.get(DcMotor.class, "left_drive_two");
         leftMotorTwo.resetDeviceConfigurationForOpMode();
-        leftMotorTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rightMotorOne = hardwareMap.get(DcMotor.class, "right_drive_one");
         rightMotorOne.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         rightMotorTwo = hardwareMap.get(DcMotor.class, "right_drive_two");
         rightMotorTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         imu = new IMU(hardwareMap);
     }
 
-    public void init() {
-
-    }
-
     public void drive(double forward, double turn) {
         drive(forward, 0.0d, turn);
     }
 
-    public void drive(Vec2 movement, double turn) {
-        if(Math.abs(movement.getX()) <= Constants.INPUT_THRESHOLD) {
-            movement.setX(0.0d);
+    public void drive(double forward, double strafe, double turn) {
+        if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
+            forward = 0.0d;
         }
-
-        if(Math.abs(movement.getY()) <= Constants.INPUT_THRESHOLD) {
-            movement.setY(0.0d);
+        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
+            strafe = 0.0d;
         }
-
-        if(Math.abs(turn) <= Constants.INPUT_THRESHOLD) {
+        if(Math.abs(turn) <= Constants.DRIVE_INPUT_THRESHOLD) {
             turn = 0.0d;
         }
 
-        if(fieldCentric) {
-            int encoderDiff = leftMotorOne.getCurrentPosition() - leftMotorTwo.getCurrentPosition();    // -inf -> inf
-            double wheelAngle = ((encoderDiff / Constants.ENCODER_COUNTS_PER_REV) * 360) % 180;         // -179 -> 179
-            double power = Math.sqrt(Math.pow(movement.getX(), 2) + Math.pow(movement.getY(), 2));      // 0    -> sqrt(2)
-            double angle = (Math.atan2(movement.getX(), movement.getY()) * 180) / Math.PI;              // -179 -> 180
-            double m1Power = 0.5 + ((angle - wheelAngle) / 10);
-            double m2Power = (0.5 - (angle - wheelAngle) / 10);
-            m1Power *= power;
-            m2Power *= power;
-
+        if(turn != 0) {
             drive(Range.clip(
-                    m1Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
+                    turn * getSpeed(), -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED
             ), Range.clip(
-                    m2Power, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED
-            ), 0.0d, 0.0d);
-        } else {
-            drive(
-                    Range.clip(
-                            movement.getY() + turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            movement.getY() - turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    ),
-                    Range.clip(
-                            movement.getY() + turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED),
-                    Range.clip(
-                            movement.getY() - turn,
-                            -Constants.MOTOR_MAX_SPEED,
-                            Constants.MOTOR_MAX_SPEED
-                    )
-            );
+                    turn * getSpeed(), -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED
+            ), Range.clip(
+                    -turn * getSpeed(), -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED
+            ), Range.clip(
+                    -turn * getSpeed(), -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED
+            ));
+            return;
         }
-    }
 
-    public void drive(double forward, double strafe, double turn) {
-        drive(new Vec2(forward, strafe), turn);
+        double targetAngle = Math.toDegrees(Math.atan2(forward, strafe));
+
+        double leftAngleDiff = getLeftWheelAngle() - targetAngle;
+        double rightWheelDiff = getRightWheelAngle() - targetAngle;
+
+        if(
+                Math.abs(leftAngleDiff) >= Constants.DRIVE_ANGLE_TOLERANCE ||
+                Math.abs(leftAngleDiff) - 180 >= Constants.DRIVE_ANGLE_TOLERANCE ||
+                Math.abs(leftAngleDiff) >= Constants.DRIVE_ANGLE_TOLERANCE ||
+                Math.abs(leftAngleDiff) - 180 >= Constants.DRIVE_ANGLE_TOLERANCE
+        ) {
+            turnToAngle(targetAngle);
+        }
     }
 
     public void drive(double p1, double p2, double p3, double p4) {
@@ -131,36 +124,43 @@ public class SwerveDrive {
         rightMotorTwo.setPower(p4);
     }
 
+    public void turnToAngle(double target) {
+        double leftWheelDiff = getLeftWheelAngle() - target;
+        double rightWheelDiff = getRightWheelAngle() - target;
+
+        
+    }
+
     public void resetWheels() {
         leftMotorOne.setPower(
                 Range.clip(
                         -leftMotorOne.getCurrentPosition() / 100,
-                        -Constants.MOTOR_MAX_SPEED,
-                        Constants.MOTOR_MAX_SPEED
+                        -Constants.DRIVE_MOTOR_MAX_SPEED,
+                        Constants.DRIVE_MOTOR_MAX_SPEED
                 )
         );
 
         leftMotorTwo.setPower(
                 Range.clip(
                         -leftMotorTwo.getCurrentPosition() / 100,
-                        -Constants.MOTOR_MAX_SPEED,
-                        Constants.MOTOR_MAX_SPEED
+                        -Constants.DRIVE_MOTOR_MAX_SPEED,
+                        Constants.DRIVE_MOTOR_MAX_SPEED
                 )
         );
 
         rightMotorOne.setPower(
                 Range.clip(
                         -rightMotorOne.getCurrentPosition() / 100,
-                        -Constants.MOTOR_MAX_SPEED,
-                        Constants.MOTOR_MAX_SPEED
+                        -Constants.DRIVE_MOTOR_MAX_SPEED,
+                        Constants.DRIVE_MOTOR_MAX_SPEED
                 )
         );
 
         rightMotorTwo.setPower(
                 Range.clip(
                         -rightMotorTwo.getCurrentPosition() / 100,
-                        -Constants.MOTOR_MAX_SPEED,
-                        Constants.MOTOR_MAX_SPEED
+                        -Constants.DRIVE_MOTOR_MAX_SPEED,
+                        Constants.DRIVE_MOTOR_MAX_SPEED
                 )
         );
     }

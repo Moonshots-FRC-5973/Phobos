@@ -3,14 +3,16 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 public class Constants {
+
     // _______________
     // ---  DRIVE  ---
     public static final double DRIVE_ANGLE_TOLERANCE = 1;
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
-    public static final double ENCODER_COUNTS_PER_REV = 2047.136;
-    public static final double INPUT_THRESHOLD = 0.15;
-    public static final double MOTOR_MAX_SPEED = 0.75;
+    public static final double DRIVE_ENCODER_COUNTS_PER_REV = 1023.568;
+    public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
+    public static final double DRIVE_INPUT_THRESHOLD = 0.15;
+    public static final double DRIVE_MOTOR_MAX_SPEED = 0.75;
 
     // ________________
     // ---  SERVOS  ---

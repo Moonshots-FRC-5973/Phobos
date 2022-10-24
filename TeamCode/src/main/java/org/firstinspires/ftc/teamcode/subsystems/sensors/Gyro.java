@@ -11,23 +11,12 @@ import org.firstinspires.ftc.teamcode.subsystems.sli.Vec2;
 public class Gyro {
     private BNO055IMU imu;
     private BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-    private static Vec2 location;
-
-    public static Vec2 getLocation() {
-        return location;
-    }
 
     /**
      * Creates a new Gyro Object.
      * @param hardwareMap the HardwareMap of the active robot.
      */
     public Gyro(HardwareMap hardwareMap) {
-        this(hardwareMap, new Vec2(0.0d, 0.0d));
-    }
-
-    public Gyro(HardwareMap hardwareMap, Vec2 startLocation) {
-        if(startLocation != null)
-            Gyro.location = startLocation;
 
         this.imu = hardwareMap.get(BNO055IMU.class, Constants.GYRO_NAME);
         this.parameters.angleUnit = Constants.ANGLE_UNIT;
@@ -119,8 +108,4 @@ public class Gyro {
         return out;
     }
 
-    public void update(double deltaTime) {
-        location.setX(location.getX() + (deltaTime * getXVelocity()));
-        location.setY(location.getY() + (deltaTime * getZVelocity()));
-    }
 }
