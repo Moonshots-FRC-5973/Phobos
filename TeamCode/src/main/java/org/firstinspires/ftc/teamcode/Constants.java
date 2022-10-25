@@ -6,13 +6,22 @@ public class Constants {
 
     // _______________
     // ---  DRIVE  ---
+    // Precision of the subsystem approaching an angle
     public static final double DRIVE_ANGLE_TOLERANCE = 1;
+    // motor names
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
+    //Swerve drive encoder count difference for the wheel to rotate once fully
     public static final double DRIVE_ENCODER_COUNTS_PER_REV = 1023.568;
+    // DEPRECATED: Power multiplier for the wheel to rotate. use Constants.DRIVE_PID_KP instead
+    @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
+    // Minimum input for the subsystem to respond
     public static final double DRIVE_INPUT_THRESHOLD = 0.15;
     public static final double DRIVE_MOTOR_MAX_SPEED = 0.75;
+    public static final double DRIVE_PID_KP = 1 / 45;
+    public static final double DRIVE_PID_KI = 1;
+    public static final double DRIVE_PID_KD = 1;
 
     // ________________
     // ---  SERVOS  ---
