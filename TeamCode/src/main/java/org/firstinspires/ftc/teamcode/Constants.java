@@ -14,7 +14,7 @@ public class Constants {
     //Swerve drive encoder count difference for the wheel to rotate once fully
     public static final double DRIVE_ENCODER_COUNTS_PER_REV = 1023.568;
     // DEPRECATED: Power multiplier for the wheel to rotate. use Constants.DRIVE_PID_KP instead
-    @Deprecated
+    //@Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
     // Minimum input for the subsystem to respond
     public static final double DRIVE_INPUT_THRESHOLD = 0.15;

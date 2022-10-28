@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.subsystems.ai.cv.Camera;
 import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 
 //Test Suite Code. Testing Swerve drive
@@ -12,7 +13,10 @@ import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 public class TestSuite extends OpMode {
     private SwerveDrive driveSystem;
     private boolean movingToAngle = false;
-    private double targetAngle = 0;
+    private double targetAngle;
+    private boolean wasRBPressed;
+    private boolean wasLBPressed;
+    private Camera camera1;
 
     /**
      * User defined init method
@@ -26,6 +30,10 @@ public class TestSuite extends OpMode {
         telemetry.addData("Status", "Initialized.");
         targetAngle = 180;
         movingToAngle = true;
+        wasRBPressed = false;
+        wasLBPressed = false;
+
+        camera1 = new Camera(hardwareMap, "Webcam 1");
     }
 
     /**
@@ -35,7 +43,17 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
+        if(gamepad1.right_bumper && !wasRBPressed) {
+            driveSystem.switchMode();
+        }
 
+        if(gamepad1.right_trigger >= Constants.DRIVE_INPUT_THRESHOLD) {
+            driveSystem.upSpeed(gamepad1.right_trigger);
+        }
+
+        if(gamepad1.left_trigger >= Constants.DRIVE_INPUT_THRESHOLD) {
+            driveSystem.dropSpeed(gamepad1.left_trigger);
+        }
 
         if(gamepad1.a) {
             movingToAngle = true;
@@ -71,6 +89,7 @@ public class TestSuite extends OpMode {
 
         telemetry.addData("Left Angle Difference", driveSystem.getLeftEncodersDifference());
         telemetry.update();
+        wasRBPressed = gamepad1.right_bumper;
     }
 
     @Override

@@ -1,6 +1,6 @@
-//package org.firstinspires.ftc.teamcode.subsystems.AI;
+//package org.firstinspires.ftc.teamcode.subsystems.ai;
 //
-//import org.firstinspires.ftc.teamcode.v1.constants.AI.PositionMapConstants;
+//import org.firstinspires.ftc.teamcode.v1.constants.ai.PositionMapConstants;
 //import org.firstinspires.ftc.teamcode.v1.systems.driveSystem.DriveSystem;
 //import org.firstinspires.ftc.teamcode.v1.systems.sensors.Gyro;
 //import org.firstinspires.ftc.teamcode.v1.systems.sli.FieldArea;

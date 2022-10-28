@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.AI.cv;
+package org.firstinspires.ftc.teamcode.subsystems.ai.cv;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -6,15 +6,15 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 public class Camera {
 
-    OpenCvCamera camera;
+    public OpenCvCamera camera;
 
     public Camera(HardwareMap hardwareMap, String name) {
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, name));
-        camera.setPipeline(new Pipeline());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, name), cameraMonitorViewId);
+        camera.setPipeline(new Pipeline(camera));
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
@@ -23,7 +23,7 @@ public class Camera {
              */
             @Override
             public void onOpened() {
-                camera.startStreaming(1920, 1080, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(1280, 800, OpenCvCameraRotation.UPRIGHT);
             }
 
             /**
@@ -36,5 +36,13 @@ public class Camera {
                 throw new RuntimeException();
             }
         });
+    }
+
+    public double getFPS() {
+        return (double)camera.getFps();
+    }
+
+    public int getMaxFPS() {
+        return camera.getCurrentPipelineMaxFps();
     }
 }

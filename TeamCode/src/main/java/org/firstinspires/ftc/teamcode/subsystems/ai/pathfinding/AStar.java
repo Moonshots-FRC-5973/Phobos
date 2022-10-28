@@ -1,4 +1,4 @@
-//package org.firstinspires.ftc.teamcode.subsystems.AI.pathfinding;
+//package org.firstinspires.ftc.teamcode.subsystems.ai.pathfinding;
 //
 //import com.qualcomm.robotcore.util.ElapsedTime;
 //
