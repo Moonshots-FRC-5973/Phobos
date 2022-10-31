@@ -46,25 +46,30 @@
 
 package org.firstinspires.ftc.teamcode.subsystems.sensors;
 
+import com.qualcomm.hardware.motors.RevRobotics20HdHexMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp
 public class ColorSensorTest extends LinearOpMode {
     // Define a variable for our color sensor
     ColorSensor color;
-
+    DcMotor myMotor;
     @Override
     public void runOpMode() {
         // Get the color sensor from hardwareMap
         color = hardwareMap.get(ColorSensor.class, "Color");
-
+        myMotor = hardwareMap.get(DcMotor.class,"right_drive_one");
         // Wait for the Play button to be pressed
         waitForStart();
 
         // While the Op Mode is running, update the telemetry values.
         while (opModeIsActive()) {
+
+
+            myMotor.setPower(.75);
             telemetry.addData("Red", color.red());
             telemetry.addData("Green", color.green());
             telemetry.addData("Blue", color.blue());
