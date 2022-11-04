@@ -6,19 +6,23 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.wrappers.SparkMINIMotor;
 
 public class Claw {
     private Servo armServo;
-    double  MIN_POSITION = 0, MAX_POSITION = 1;
-    double armPosition = .5;
-    private HardwareMap hardwareMap;
+    private SparkMINIMotor leftArmMotor;
+    private SparkMINIMotor rightArmMotor;
+    private static final double  MIN_POSITION = 0;
+    private static final double MAX_POSITION = 1;
+    private double armPosition;
     private Telemetry telemetry;
 
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry){
-        this.hardwareMap = hardwareMap;
+    public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         armServo = hardwareMap.servo.get(Constants.ARM_SERVO_NAME);
+        leftArmMotor = new SparkMINIMotor(hardwareMap, "arm_drive_left", "arm_drive_left_encoder");
+        rightArmMotor = new SparkMINIMotor(hardwareMap, "arm_drive_right", "arm_drive_right_encoder");
         armPosition = 0.5;
     }
 

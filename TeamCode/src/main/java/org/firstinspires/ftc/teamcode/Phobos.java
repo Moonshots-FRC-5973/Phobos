@@ -29,13 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 import org.firstinspires.ftc.teamcode.subsystems.drives.ArcadeDrive;
+import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -55,12 +57,13 @@ import org.firstinspires.ftc.teamcode.subsystems.drives.ArcadeDrive;
 public class Phobos extends OpMode
 {
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
 
     // ----------
     // SUBSYSTEMS
-    private ArcadeDrive drive = new ArcadeDrive();
-    private Claw claw = new Claw();
+    private SwerveDrive swerveDrive;
+    private ConeDetection coneDetection;
+    private Claw claw;
 
 
     /*
@@ -68,13 +71,17 @@ public class Phobos extends OpMode
      */
     @Override
     public void init() {
+        coneDetection = new ConeDetection(hardwareMap);
+        telemetry = new MultipleTelemetry(telemetry, coneDetection.getTelemetry());
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
 
         // INIT SUBSYSTEMS
-        drive.init(hardwareMap);
-        claw.init(hardwareMap, telemetry);
-
+        //claw.init(hardwareMap, telemetry);
+        swerveDrive = new SwerveDrive(hardwareMap, runtime, telemetry);
+        //Send the one telemetry info piece to the DS / Dashboard
+        telemetry.update();
+        coneDetection.update();
     }
 
     /*
@@ -82,6 +89,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void init_loop() {
+
     }
 
     /*
@@ -97,34 +105,19 @@ public class Phobos extends OpMode
      */
     @Override
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
-        double leftPower;
-        double rightPower;
-
-        // POV Mode uses left stick to go forward, and right stick to turn.
-        // - This uses basic math to combine motions and is easier to drive straight.
-        double fwd = -gamepad1.left_stick_y;
-        double turn  = -gamepad1.right_stick_x;
-        leftPower    = Range.clip(fwd + turn, -1.0, 1.0) ;
-        rightPower   = Range.clip(fwd - turn, -1.0, 1.0) ;
-        drive.drive(leftPower, rightPower);
-
-
-
-        // ---------
-        // SERVO TEST
-        // move arm down on A button if not already at lowest position.
-        if (gamepad1.a) claw.open();
-
-        // move arm up on B button if not already at the highest position.
-        if (gamepad1.b) claw.close();
-
-
-        // -----------------
-        // TELEMETRY UPDATES
-        // Show the elapsed game time and wheel power.
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        coneDetection.update();
+        telemetry.addData("Runtime", runtime.seconds());
+        telemetry.addData("RSX", gamepad1.right_stick_x);
+        if(gamepad1.left_stick_button) {
+            swerveDrive.resetWheels();
+            return;
+        }
+        swerveDrive.drive(
+                gamepad1.left_stick_y,
+                gamepad1.left_stick_x,
+                gamepad1.right_stick_x
+        );
+        telemetry.update();
     }
 
     /*
@@ -132,7 +125,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void stop() {
-        drive.stop();
+        swerveDrive.stop();
     }
 
 }

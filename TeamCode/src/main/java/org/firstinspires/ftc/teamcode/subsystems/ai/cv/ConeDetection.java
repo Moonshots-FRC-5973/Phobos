@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems.ai.cv;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -14,27 +16,48 @@ import java.util.List;
 public class ConeDetection {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tflite;
+    private FtcDashboard ftcDashboard;
+    private Telemetry telemetry;
+
+    public Telemetry getTelemetry() {
+        return telemetry;
+    }
 
     public ConeDetection(HardwareMap hardwareMap) {
+        // Init FTCDashboard
+        ftcDashboard = FtcDashboard.getInstance();
+        if(ftcDashboard == null) {
+            throw new NullPointerException("FTCDashboard instance was null after creation");
+        }
+        telemetry = ftcDashboard.getTelemetry();
+        if(telemetry == null) {
+            throw new NullPointerException("FTCDashboard Telemetry was null after creation");
+        }
+
         //Init Vuforia (required apparently? idk)
         VuforiaLocalizer.Parameters vuParams = new VuforiaLocalizer.Parameters();
         vuParams.vuforiaLicenseKey = Constants.OD_VUFORIA_KEY;
         vuParams.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
         vuforia = ClassFactory.getInstance().createVuforia(vuParams);
 
+        // Put the camera on the FTC Dashboard
+        ftcDashboard.startCameraStream(vuforia, 30);
+
         //Init TFLite
         TFObjectDetector.Parameters tfliteParams = new TFObjectDetector.Parameters();
-        int viewID = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName()
-        );
         tfliteParams.minResultConfidence = 0.75f;
         tfliteParams.isModelTensorFlow2 = true;
         tfliteParams.inputSize = 300;
         tflite = ClassFactory.getInstance().createTFObjectDetector(tfliteParams, vuforia);
+
         try {
             tflite.loadModelFromAsset(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
         } catch(Exception e) {
-            tflite.loadModelFromFile(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
+            try {
+                tflite.loadModelFromFile(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
+            } catch(Exception exception) {
+                telemetry.addData("", "No Model Loaded");
+            }
         }
 
         if(tflite == null) {
@@ -45,7 +68,8 @@ public class ConeDetection {
     }
 
     public void update() {
-        tflite.getUpdatedRecognitions();
+        telemetry.addData("TFLite", this.toString());
+        telemetry.update();
     }
 
     public List<Recognition> getRecognitions() {
@@ -56,7 +80,7 @@ public class ConeDetection {
     public String toString() {
         String obj = "TFLite instance:\n\t";
         List<Recognition> recognitionList = getRecognitions();
-        if(recognitionList == null) {
+        if(recognitionList.size() == 0) {
             obj += "No objects detected.\n";
         } else {
             obj += "Number of objects detected: " + recognitionList.size();

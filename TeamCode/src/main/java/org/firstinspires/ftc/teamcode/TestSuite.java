@@ -1,7 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.rev.RevSPARKMini;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -11,12 +17,14 @@ import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 //Test Suite Code. Testing Swerve drive
 @TeleOp(name="Test Suite", group="TeleOp")
 public class TestSuite extends OpMode {
-    private SwerveDrive driveSystem;
-    private boolean movingToAngle = false;
-    private double targetAngle;
-    private boolean wasRBPressed;
-    private boolean wasLBPressed;
-    private Camera camera1;
+    private DcMotorSimple armMotor1;
+    private DigitalChannel armMotorEncoder1;
+    private int armPosition1 = 0;
+    private boolean prevState1;
+    private DcMotorSimple armMotor2;
+    private DigitalChannel armMotorEncoder2;
+    private int armPosition2 = 0;
+    private boolean prevState2;
 
     /**
      * User defined init method
@@ -25,15 +33,15 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void init() {
-        driveSystem = new SwerveDrive(hardwareMap, new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS));
-        driveSystem.makeRobotCentric();
-        telemetry.addData("Status", "Initialized.");
-        targetAngle = 180;
-        movingToAngle = true;
-        wasRBPressed = false;
-        wasLBPressed = false;
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        armMotor1 = hardwareMap.get(DcMotorSimple.class, "arm_drive_left");
+        armMotorEncoder1 = hardwareMap.get(DigitalChannel.class, "arm_motor_encoder_left");
+        prevState1 = armMotorEncoder1.getState();
 
-        camera1 = new Camera(hardwareMap, "Webcam 1");
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        armMotor2 = hardwareMap.get(DcMotorSimple.class, "arm_drive_right");
+        armMotorEncoder2 = hardwareMap.get(DigitalChannel.class, "arm_motor_encoder_right");
+        prevState2 = armMotorEncoder2.getState();
     }
 
     /**
@@ -43,129 +51,37 @@ public class TestSuite extends OpMode {
      */
     @Override
     public void loop() {
-        if(gamepad1.right_bumper && !wasRBPressed) {
-            driveSystem.switchMode();
+        telemetry.addData("LSY", gamepad1.left_stick_y);
+        armMotor1.setPower(Range.clip(gamepad1.left_stick_y,
+               -Constants.DRIVE_MOTOR_MAX_SPEED,
+               Constants.DRIVE_MOTOR_MAX_SPEED
+        ));
+        armMotor2.setPower(Range.clip(gamepad1.left_stick_y,
+                -Constants.DRIVE_MOTOR_MAX_SPEED,
+                Constants.DRIVE_MOTOR_MAX_SPEED
+        ));
+
+        if(armMotorEncoder1.getState() != prevState1) {
+            if(gamepad1.left_stick_y >= 0)
+                armPosition1++;
+            else
+                armPosition1--;
+        }
+        if(armMotorEncoder2.getState() != prevState2) {
+            if(gamepad1.left_stick_y >= 0)
+                armPosition2++;
+            else
+                armPosition2--;
         }
 
-        if(gamepad1.right_trigger >= Constants.DRIVE_INPUT_THRESHOLD) {
-            driveSystem.upSpeed(gamepad1.right_trigger);
-        }
-
-        if(gamepad1.left_trigger >= Constants.DRIVE_INPUT_THRESHOLD) {
-            driveSystem.dropSpeed(gamepad1.left_trigger);
-        }
-
-        if(gamepad1.a) {
-            movingToAngle = true;
-            targetAngle = 180;
-        }
-
-        if(gamepad1.b) {
-            movingToAngle = true;
-            targetAngle = 90;
-        }
-
-        if(gamepad1.y) {
-            movingToAngle = true;
-            targetAngle = 0;
-        }
-
-        if(gamepad1.x) {
-            movingToAngle = true;
-            targetAngle = 270;
-        }
-
-        if(movingToAngle) {
-            telemetry.addData("Mode", "TTA");
-            turnToAngle(targetAngle);
-        } else {
-            telemetry.addData("Mode", "DR1");
-            drive(
-                    gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    gamepad1.right_stick_x
-            );
-        }
-
-        telemetry.addData("Left Angle Difference", driveSystem.getLeftEncodersDifference());
-        telemetry.update();
-        wasRBPressed = gamepad1.right_bumper;
+        prevState1 = armMotorEncoder1.getState();
+        telemetry.addData("Encoder Value", armPosition1);
+        telemetry.addData("Encoder Value", armPosition2);
     }
 
     @Override
     public void stop() {
-        driveSystem.stop();
-    }
-
-    private void drive(double forward, double strafe, double turn) {
-        telemetry.addData("Inputs", String.format("%f, %f, %f", forward, strafe, turn));
-
-        if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
-            forward = 0.0d;
-        }
-
-        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
-            strafe = 0.0d;
-        }
-
-        if(Math.abs(turn) <= Constants.DRIVE_INPUT_THRESHOLD) {
-            turn = 0.0d;
-        }
-
-        double targetAngle = Math.toDegrees(Math.atan2(strafe, forward));
-        telemetry.addData("Target Angle", targetAngle);
-
-        double leftWheelAngle = driveSystem.getLeftWheelAngle();
-        telemetry.addData("Left Wheel Angle", leftWheelAngle);
-        double rightWheelAngle = driveSystem.getRightWheelAngle();
-        telemetry.addData("Right Wheel Angle", rightWheelAngle);
-        double leftAngleDiff = targetAngle - leftWheelAngle;
-        telemetry.addData("Left Angle Diff", leftAngleDiff);
-        double rightAngleDiff = targetAngle - leftWheelAngle;
-        telemetry.addData("Right Angle Diff", rightAngleDiff);
-
-        forward = Range.clip(forward, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED);
-        turn = Range.clip(turn, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED);
-
-        if(turn != 0) {
-            driveSystem.drive(turn, turn, -turn, -turn);
-        } else if(Math.abs(leftAngleDiff) >= Constants.DRIVE_ANGLE_TOLERANCE) {
-            turnToAngle(targetAngle);
-        } else {
-            driveSystem.drive(forward, forward, forward, forward);
-        }
-    }
-
-    private void turnToAngle(double target) {
-        telemetry.addData("Target Angle", target);
-        double leftWheelAngle = driveSystem.getLeftWheelAngle();
-        telemetry.addData("Left Wheel Angle", leftWheelAngle);
-        double rightWheelAngle = driveSystem.getRightWheelAngle();
-        telemetry.addData("Right Wheel Angle", rightWheelAngle);
-
-
-        double leftAngleDiff = target - leftWheelAngle;
-        telemetry.addData("Left Angle Diff", leftAngleDiff);
-        double leftRotationPower = Range.clip(
-                Constants.DRIVE_ROTATION_POWER_MODIFIER * Math.sin(Math.toRadians(leftAngleDiff)),
-                -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED);
-        double rightAngleDiff = target - rightWheelAngle;
-        telemetry.addData("Right Angle Diff", rightAngleDiff);
-        double rightRotationPower = Range.clip(
-                Constants.DRIVE_ROTATION_POWER_MODIFIER * Math.sin(Math.toRadians(rightAngleDiff)),
-                -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED);
-
-        if(
-                (Math.abs(leftAngleDiff) <= Constants.DRIVE_ANGLE_TOLERANCE ||
-                        Math.abs(leftAngleDiff) - 180 <= Constants.DRIVE_ANGLE_TOLERANCE ) &&
-                (Math.abs(rightAngleDiff) <= Constants.DRIVE_ANGLE_TOLERANCE ||
-                        Math.abs(rightAngleDiff) - 180 <= Constants.DRIVE_ANGLE_TOLERANCE)
-        ) {
-            driveSystem.stop();
-            movingToAngle = false;
-        } else {
-            driveSystem.drive(leftRotationPower, -leftRotationPower,
-                    rightRotationPower, -rightRotationPower);
-        }
+        armMotor1.setPower(0.0d);
+        armMotor2.setPower(0.0d);
     }
 }
