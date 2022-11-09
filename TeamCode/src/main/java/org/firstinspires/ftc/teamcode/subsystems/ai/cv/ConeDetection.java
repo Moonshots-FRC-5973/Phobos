@@ -35,7 +35,7 @@ public class ConeDetection {
         }
 
         //Init Vuforia (required apparently? idk)
-        VuforiaLocalizer.Parameters vuParams = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters vuParams = new VuforiaLocalizer.Parameters(hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()));
         vuParams.vuforiaLicenseKey = Constants.OD_VUFORIA_KEY;
         vuParams.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
         vuforia = ClassFactory.getInstance().createVuforia(vuParams);
