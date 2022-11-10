@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 import org.firstinspires.ftc.teamcode.subsystems.drives.ArcadeDrive;
+import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 
@@ -63,7 +64,8 @@ public class Phobos extends OpMode
     // ----------
     // SUBSYSTEMS
     // private SwerveDrive swerveDrive;
-    private MecanumDrive mecanumDrive;
+    // private MecanumDrive mecanumDrive;
+    private Drivetrain drive;
     private ConeDetection coneDetection;
     private Claw claw;
 
@@ -78,8 +80,8 @@ public class Phobos extends OpMode
 
         // INIT SUBSYSTEMS
         //claw.init(hardwareMap, telemetry);
-        // swerveDrive = new SwerveDrive(hardwareMap, runtime, telemetry);
-        mecanumDrive = new MecanumDrive(hardwareMap, telemetry);
+        // drive = new SwerveDrive(hardwareMap, runtime, telemetry);
+        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
 
         //Send the telemetry info pieces to the DS / Dashboard
         // Tell the driver that initialization is complete.
@@ -110,17 +112,12 @@ public class Phobos extends OpMode
     public void loop() {
         coneDetection.update();
         telemetry.addData("Runtime", runtime.seconds());
-        telemetry.addData("RSX", gamepad1.right_stick_x);
         if(gamepad1.left_stick_button) {
-            // swerveDrive.resetWheels();
+            drive.resetWheels();
             return;
         }
-        // swerveDrive.drive(
-        mecanumDrive.drive(
-                gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                -gamepad1.right_stick_x
-        );
+        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
+        //drive.drive(0.0d, -0.25d, 0.0d);
         telemetry.update();
     }
 
@@ -129,8 +126,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void stop() {
-        //swerveDrive.stop();
-        mecanumDrive.stop();
+        drive.stop();
     }
 
 }
