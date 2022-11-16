@@ -56,7 +56,7 @@ public class ConeDetection {
             try {
                 tflite.loadModelFromFile(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
             } catch(Exception exception) {
-                telemetry.addData("", "No Model Loaded");
+                telemetry.addData("TFLite", "No Model Loaded");
             }
         }
 

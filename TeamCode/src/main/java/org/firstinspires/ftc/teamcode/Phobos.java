@@ -36,7 +36,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
-import org.firstinspires.ftc.teamcode.subsystems.drives.ArcadeDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
@@ -63,8 +62,6 @@ public class Phobos extends OpMode
 
     // ----------
     // SUBSYSTEMS
-    // private SwerveDrive swerveDrive;
-    // private MecanumDrive mecanumDrive;
     private Drivetrain drive;
     private ConeDetection coneDetection;
     private Claw claw;
@@ -75,12 +72,11 @@ public class Phobos extends OpMode
      */
     @Override
     public void init() {
-        coneDetection = new ConeDetection(hardwareMap);
-        telemetry = new MultipleTelemetry(telemetry, coneDetection.getTelemetry());
+        //coneDetection = new ConeDetection(hardwareMap);
+        //telemetry = new MultipleTelemetry(telemetry, coneDetection.getTelemetry());
 
         // INIT SUBSYSTEMS
-        //claw.init(hardwareMap, telemetry);
-        // drive = new SwerveDrive(hardwareMap, runtime, telemetry);
+        //claw = new Claw(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, runtime, telemetry);
 
         //Send the telemetry info pieces to the DS / Dashboard
@@ -94,7 +90,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void init_loop() {
-
+        //coneDetection.update();
     }
 
     /*
@@ -110,15 +106,28 @@ public class Phobos extends OpMode
      */
     @Override
     public void loop() {
-        coneDetection.update();
         telemetry.addData("Runtime", runtime.seconds());
         if(gamepad1.left_stick_button) {
-            drive.resetWheels();
-            return;
+            telemetry.addData("Drive", "Resetting Wheels");
+            //drive.resetWheels();
+        } else {
+            telemetry.addData("Drive", "Driving");
+            drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         }
-        drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
-        //drive.drive(0.0d, -0.25d, 0.0d);
+
+        if(gamepad2.right_bumper) {
+            telemetry.addData("Arm", "Raising");
+            //claw.raiseArm();
+        } else if(gamepad2.left_bumper) {
+            telemetry.addData("Arm", "Lowering");
+            //claw.lowerArm();
+        } else {
+            telemetry.addData("Arm", "No Input");
+        }
+
+        //claw.update();
         telemetry.update();
+        //coneDetection.update();
     }
 
     /*

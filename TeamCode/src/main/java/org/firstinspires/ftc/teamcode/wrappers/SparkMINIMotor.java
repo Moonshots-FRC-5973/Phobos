@@ -15,10 +15,6 @@ public class SparkMINIMotor {
     private int target;
     private double power;
 
-    public SparkMINIMotor(HardwareMap hardwareMap, String name) {
-        this(hardwareMap, name, name + "_encoder");
-    }
-
     public SparkMINIMotor(HardwareMap hardwareMap, String name, String encoderName) {
         motor = hardwareMap.get(DcMotorSimple.class, name);
         encoder = hardwareMap.get(DigitalChannel.class, encoderName);

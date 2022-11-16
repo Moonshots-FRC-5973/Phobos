@@ -78,13 +78,9 @@ public class SwerveDrive extends Drivetrain {
         if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
             strafe = 0.0d;
         }
+
         if(Math.abs(turn) >= Constants.DRIVE_INPUT_THRESHOLD) {
-            drive(
-                    (-turn * getSpeed()),
-                    (-turn * getSpeed()),
-                    (turn * getSpeed()),
-                    (turn * getSpeed())
-            );
+            drive((-turn * getSpeed()), (-turn * getSpeed()), (turn * getSpeed()), (turn * getSpeed()));
             return;
         }
 
@@ -118,7 +114,6 @@ public class SwerveDrive extends Drivetrain {
             getTelemetry().addData("Power", power);
             getTelemetry().addData("Left Wheel Angle", getLeftWheelAngle());
             getTelemetry().addData("Right Wheel Angle", getRightWheelAngle());
-            getTelemetry().addData("Left Wheel Power", "%f%f", llPower, lrPower);
         }
 
         drive(llPower, lrPower, rlPower, rrPower);
@@ -148,5 +143,10 @@ public class SwerveDrive extends Drivetrain {
                 -rightMotorLeft.getCurrentPosition() / Constants.DRIVE_ENCODER_COUNTS_PER_REV,
                 -rightMotorRight.getCurrentPosition() / Constants.DRIVE_ENCODER_COUNTS_PER_REV
         );
+    }
+
+    @Override
+    public void turnRobotToAngle(double target) {
+
     }
 }

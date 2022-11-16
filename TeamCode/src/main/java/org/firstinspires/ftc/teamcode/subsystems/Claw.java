@@ -9,39 +9,40 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.wrappers.SparkMINIMotor;
 
 public class Claw {
-    private Servo armServo;
+    private Servo clawAngleServo;
+    private Servo clawOpenServo;
     private SparkMINIMotor leftArmMotor;
     private SparkMINIMotor rightArmMotor;
-    private static final double  MIN_POSITION = 0;
-    private static final double MAX_POSITION = 1;
-    private double armPosition;
     private Telemetry telemetry;
-
 
     public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        armServo = hardwareMap.servo.get(Constants.ARM_SERVO_NAME);
+        clawAngleServo = hardwareMap.servo.get("claw_angle_servo");
+        clawOpenServo = hardwareMap.servo.get("claw_open_servo");
         leftArmMotor = new SparkMINIMotor(hardwareMap, "arm_drive_left", "arm_drive_left_encoder");
         rightArmMotor = new SparkMINIMotor(hardwareMap, "arm_drive_right", "arm_drive_right_encoder");
-        armPosition = 0.5;
     }
 
-    public void open(){
-         if(armPosition > MIN_POSITION) {
-             armPosition -= .01;
-             execute();
-         }
+    public void raiseArm(){
+         leftArmMotor.setTargetPosition(Constants.CLAW_OPENED_POSITION);
+         leftArmMotor.setPower(Constants.CLAW_MOTOR_POWER);
+         rightArmMotor.setTargetPosition(Constants.CLAW_OPENED_POSITION);
+         rightArmMotor.setPower(Constants.CLAW_MOTOR_POWER);
     }
 
-    public void close(){
-         if(armPosition < MAX_POSITION) {
-             armPosition += .01;
-             execute();
-         }
+    public void lowerArm(){
+         leftArmMotor.setTargetPosition(0);
+         leftArmMotor.setPower(Constants.CLAW_MOTOR_POWER);
+         rightArmMotor.setTargetPosition(0);
+         rightArmMotor.setPower(Constants.CLAW_MOTOR_POWER);
     }
 
-    private void execute(){
-        armServo.setPosition(Range.clip(armPosition, MIN_POSITION, MAX_POSITION));
-        telemetry.addData("arm servo", "position=" + armPosition + "  actual=" + armServo.getPosition());
+    public void update(){
+        leftArmMotor.update();
+        rightArmMotor.update();
+    }
+
+    public void stop() {
+
     }
 }

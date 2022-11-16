@@ -38,15 +38,15 @@ public class MecanumDrive extends Drivetrain {
         }
 
         if (Math.abs(turn) >= Constants.DRIVE_INPUT_THRESHOLD) {
-            drive(-turn, turn, turn, turn);
+            drive(-turn, -turn, turn, -turn);
             return;
         }
 
         drive(
-              forward - strafe,
-              forward - strafe,
               -forward + strafe,
-              -forward + strafe
+              -forward - strafe,
+              -forward + strafe,
+              forward + strafe
         );
     }
 
@@ -71,5 +71,10 @@ public class MecanumDrive extends Drivetrain {
                 -rightFrontDrive.getCurrentPosition() / Constants.DRIVE_ENCODER_COUNTS_PER_REV,
                 -rightBackDrive.getCurrentPosition() / Constants.DRIVE_ENCODER_COUNTS_PER_REV
         );
+    }
+
+    @Override
+    public void turnRobotToAngle(double target) {
+
     }
 }

@@ -24,6 +24,11 @@ public class Constants {
     public static final double DRIVE_PID_KD = 1;
 
     // ________________
+    // ----  ClAW  ----
+    public static final int CLAW_OPENED_POSITION = 100;
+    public static final double CLAW_MOTOR_POWER = 0.7;
+
+    // ________________
     // ---  SERVOS  ---
     public static final String ARM_SERVO_NAME = "servo0";
 
