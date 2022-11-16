@@ -62,7 +62,7 @@ public class Phobos extends OpMode
 
     // ----------
     // SUBSYSTEMS
-    private Drivetrain drive;
+    private MecanumDrive drive;
     private ConeDetection coneDetection;
     private Claw claw;
 
@@ -107,14 +107,21 @@ public class Phobos extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Runtime", runtime.seconds());
+
+        // DRIVE CONTROLS
         if(gamepad1.left_stick_button) {
             telemetry.addData("Drive", "Resetting Wheels");
             //drive.resetWheels();
-        } else {
+        }
+        else if(gamepad1.a){
+            drive.turnRobotByDegree(90);
+        }
+        else {
             telemetry.addData("Drive", "Driving");
             drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
         }
 
+        // CLAW CONTROLS
         if(gamepad2.right_bumper) {
             telemetry.addData("Arm", "Raising");
             //claw.raiseArm();
