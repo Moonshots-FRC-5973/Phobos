@@ -14,6 +14,7 @@ public class MecanumDrive extends Drivetrain {
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
+    private boolean driving = true;
 
     public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
         super(hardwareMap, runtime, telemetry);
@@ -26,6 +27,7 @@ public class MecanumDrive extends Drivetrain {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive = hardwareMap.get(DcMotor.class,"right_drive_back");
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     public void drive(double forward, double strafe, double turn) {
@@ -75,41 +77,48 @@ public class MecanumDrive extends Drivetrain {
     }
 
     @Override
-    public void turnRobotToAngle(double target) {
+    public boolean turnRobotToAngle(double target) {
         // NOTE: Negative return values will increase the gyro's value
         double MAX_POWER = 0.5; // cap the power
         double MIN_POWER = 0.1; // lowest effective power
         int ENOUGH_CHECKS = 15; // how many times do we pass our target until we're satisfied?
         int check = 0;
 
-        while(true) {
-            // determine the error
-            double error = target - imu.getZAngle();
+        // determine the error
+        double error = target - imu.getZAngle();
 
-            // determine the power output neutral of direction
-            double output = Math.abs(error / target) * MAX_POWER;
-            if (output < MIN_POWER) output = MIN_POWER;
-            if (output > MAX_POWER) output = MAX_POWER;
+        // determine the power output neutral of direction
+        double output = Math.abs(error / target) * MAX_POWER;
+        if (output < MIN_POWER) output = MIN_POWER;
+        if (output > MAX_POWER) output = MAX_POWER;
 
-            // are we there yet? this is to avoid ping-ponging
-            // plus we never stop the method unless our output is zero
-            if (Math.abs(error) < Constants.DRIVE_ANGLE_TOLERANCE) check++;
-            if (check > ENOUGH_CHECKS) {
-                stop();
-                break;
-            }
+        //we are commenting this out because we got rid of the loop.
+        // are we there yet? this is to avoid ping-ponging
+        // plus we never stop the method unless our output is zero
+//        if (Math.abs(error) < Constants.DRIVE_ANGLE_TOLERANCE) check++;
+//        if (check > ENOUGH_CHECKS) {
+//            stop();
+//            break;
+//        }
 
-            // determine the direction
-            // if I was trying to go a positive angle change from the start
-            if (target > 0) {
-                if (error > 0) drive(output, output, -output, output); // move in a positive direction
-                else drive(-output, -output, output, -output); // compensate for over-turning by going a negative direction
-            }
-            // if I was trying to go a negative angle from the start
-            else {
-                if (error < 0) drive(-output, -output, output, -output); // move in a negative direction as intended
-                else drive(output, output, -output, output); // compensate for over-turning by moving a positive direction
-            }
+        // determine the direction
+        // if I was trying to go a positive angle change from the start
+        if (target > 0) {
+            if (error > 0) drive(output, output, -output, output); // move in a positive direction
+            else drive(-output, -output, output, -output); // compensate for over-turning by going a negative direction
+        }
+        // if I was trying to go a negative angle from the start
+        else {
+            if (error < 0) drive(-output, -output, output, -output); // move in a negative direction as intended
+            else drive(output, output, -output, output); // compensate for over-turning by moving a positive direction
+        }
+        //if we have reached our angle we are done
+        if (math.abs(error < Constants.DRIVE_ANGLE_TOLERANCE)){
+            stop();
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
