@@ -169,7 +169,7 @@ public class MecanumDrive extends Drivetrain {
             turningToAngle = true;
         }
         // As we approach the angle, we need to slow down the rotation
-        double power = -error / 360;//-error * (error - Constants.DRIVE_ANGLE_TOLERANCE) * (error + Constants.DRIVE_ANGLE_TOLERANCE) / 360;
+        double power = Range.clip(-error / 360, -0.5, 0.5);//-error * (error - Constants.DRIVE_ANGLE_TOLERANCE) * (error + Constants.DRIVE_ANGLE_TOLERANCE) / 360;
         drive(power, power, -power, power);
     }
 
