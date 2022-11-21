@@ -97,4 +97,10 @@ public class ConeDetection {
         for(Recognition r : rList) { if(r.getLabel() == "Red Cone") { return true; } }
         return false;
     }
+    public boolean isBlueConeInView(){
+        List<Recognition> recognitionList = getRecognitions();
+        if(recognitionList == null) {return false;}
+        for(Recognition recognition : recognitionList) {if(recognition.getLabel() == "Blue Cone") {return true}}
+        return false;
+    }
 }
