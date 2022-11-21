@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -62,7 +63,7 @@ public class Phobos extends OpMode
 
     // ----------
     // SUBSYSTEMS
-    private MecanumDrive drive;
+    private Drivetrain drive;
     private ConeDetection coneDetection;
     private Claw claw;
 
@@ -72,8 +73,9 @@ public class Phobos extends OpMode
      */
     @Override
     public void init() {
+        // Add the telemetry output to the dashboard
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         //coneDetection = new ConeDetection(hardwareMap);
-        //telemetry = new MultipleTelemetry(telemetry, coneDetection.getTelemetry());
 
         // INIT SUBSYSTEMS
         //claw = new Claw(hardwareMap, telemetry);
@@ -109,18 +111,7 @@ public class Phobos extends OpMode
         telemetry.addData("Runtime", runtime.seconds());
 
         // DRIVE CONTROLS
-        if(gamepad1.left_stick_button) {
-            telemetry.addData("Drive", "Resetting Wheels");
-            //drive.resetWheels();
-        }
-        else if(gamepad1.a){
-            drive.turnRobotByDegree(90);
-        }
-        else {
-            telemetry.addData("Drive", "Driving");
-            drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-        }
-
+        driver1Inputs();
         // CLAW CONTROLS
         if(gamepad2.right_bumper) {
             telemetry.addData("Arm", "Raising");
@@ -131,10 +122,51 @@ public class Phobos extends OpMode
         } else {
             telemetry.addData("Arm", "No Input");
         }
-
+        telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
         //claw.update();
         telemetry.update();
         //coneDetection.update();
+    }
+
+    // Sorry Mr. A, this is the only way I can get the control flow right.
+    public void driver1Inputs() {
+        if (gamepad1.left_stick_button) {
+            telemetry.addData("Drive", "Resetting wheels");
+            drive.resetWheels();
+            return;
+        }
+        // DPad inputs, checking for overload; control for the drivetrain to rotate the robot
+        boolean turnUp = (gamepad1.dpad_up && !gamepad1.dpad_down);
+        boolean turnDown = (gamepad1.dpad_down && !gamepad1.dpad_up);
+        boolean turnLeft = (gamepad1.dpad_left && !gamepad1.dpad_right);
+        boolean turnRight = (gamepad1.dpad_right && !gamepad1.dpad_left);
+        if(turnUp) {
+            telemetry.addData("Drive", "Turning back to original front");
+            if(turnRight) {
+                drive.turnRobotToAngle(-45);
+            } else if(turnLeft) {
+                drive.turnRobotToAngle(45);
+            } else {
+                drive.turnRobotToAngle(0);
+            }
+        } else if(turnDown) {
+            telemetry.addData("Drive", "Turning to the reverse of start");
+            if (turnRight) {
+                drive.turnRobotToAngle(-135);
+            } else if (turnLeft) {
+                drive.turnRobotToAngle(135);
+            } else {
+                drive.turnRobotToAngle(180);
+            }
+        } else if(turnRight) {
+            drive.turnRobotToAngle(-90);
+        } else if(turnLeft) {
+            drive.turnRobotToAngle(90);
+        }
+        else {
+            telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
+            drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        }
     }
 
     /*

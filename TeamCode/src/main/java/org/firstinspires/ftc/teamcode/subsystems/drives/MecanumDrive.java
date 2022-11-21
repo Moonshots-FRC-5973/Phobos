@@ -16,6 +16,8 @@ public class MecanumDrive extends Drivetrain {
     private DcMotor rightBackDrive;
     private boolean gyroLocked = false;
     private double gyroTarget;
+    private boolean turningToAngle = false;
+    private double targetHeading;
 
     public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
         super(hardwareMap, runtime, telemetry);
@@ -31,6 +33,11 @@ public class MecanumDrive extends Drivetrain {
     }
 
     public void drive(double forward, double strafe, double turn) {
+        // If we're turning to an angle, continue turning to the angle and ignore drive inputs.
+        if(turningToAngle) {
+            turnRobotToAngle(targetHeading);
+            return;
+        }
 
         // DEADZONES
         if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
@@ -110,13 +117,14 @@ public class MecanumDrive extends Drivetrain {
 
     @Override
     public void turnRobotToAngle(double target) {
+        targetHeading = target;
         // NOTE: Negative return values will increase the gyro's value
-        double MAX_POWER = 0.5; // cap the power
-        double MIN_POWER = 0.1; // lowest effective power
-        int ENOUGH_CHECKS = 15; // how many times do we pass our target until we're satisfied?
-        int check = 0;
+        //double MAX_POWER = 0.5; // cap the power
+        //double MIN_POWER = 0.1; // lowest effective power
+        //int ENOUGH_CHECKS = 15; // how many times do we pass our target until we're satisfied?
+        //int check = 0;
 
-        while(true) {
+        /*while(true) {
             // determine the error
             double error = target - imu.getZAngle();
 
@@ -145,6 +153,24 @@ public class MecanumDrive extends Drivetrain {
                 else drive(output, output, -output, output); // compensate for over-turning by moving a positive direction
             }
         }
+
+         */
+        // Get the error. Positive means we need to rotate to the left
+        double error = targetHeading - imu.getZAngle();
+        // Ensure we don't move farther than one rotation
+        error %= 360;
+        telemetry.addData("Rot Error", error);
+        // If we are within the requested tolerance (Constants.DRIVE_ANGLE_TOLERANCE), we should stop turning
+        if(Math.abs(error) <= Constants.DRIVE_ANGLE_TOLERANCE) {
+            stop();
+            turningToAngle = false;
+            return;
+        } else {
+            turningToAngle = true;
+        }
+        // As we approach the angle, we need to slow down the rotation
+        double power = -error / 360;//-error * (error - Constants.DRIVE_ANGLE_TOLERANCE) * (error + Constants.DRIVE_ANGLE_TOLERANCE) / 360;
+        drive(power, power, -power, power);
     }
 
     public void turnRobotByDegree(double target){
