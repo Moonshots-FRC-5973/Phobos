@@ -43,6 +43,7 @@ public class Claw {
     }
 
     public void stop() {
-
+        leftArmMotor.setPower(0.0d);
+        rightArmMotor.setPower(0.0d);
     }
 }
