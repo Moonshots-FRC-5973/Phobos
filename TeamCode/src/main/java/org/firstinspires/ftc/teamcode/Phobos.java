@@ -65,7 +65,7 @@ public class Phobos extends OpMode
     private MecanumDrive drive;
     private ConeDetection coneDetection;
     private Claw claw;
-    private boolean driving = true;
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -114,12 +114,11 @@ public class Phobos extends OpMode
             //drive.resetWheels();
         }
         else if(gamepad1.a){
-            driving = drive.turnRobotToAngle(90);
+            drive.turnRobotByDegree(90);
         }
-        else if(driving) {
+        else {
             telemetry.addData("Drive", "Driving");
             drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-
         }
 
         // CLAW CONTROLS
