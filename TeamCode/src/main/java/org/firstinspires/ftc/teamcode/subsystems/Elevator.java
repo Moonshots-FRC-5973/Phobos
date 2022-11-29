@@ -18,15 +18,14 @@ public class Elevator {
     // Feel free to finish
 public void raiseElevator(){
     rightArmControl.setPower();
-    rightArmControl.setTargetPosition();
+    rightArmControl.set
     leftArmControl.setPower();
-    leftArmControl.setTargetPosition();
+    leftArmControl.set
 }
 public void lowerElevator(){
         rightArmControl.setPower();
-        rightArmControl.setTargetPosition();
+        rightArmControl.setMode()
         leftArmControl.setPower();
-        leftArmControl.setTargetPosition();
-}
+        leftArmControl.set
 public void stopMotors
 }
