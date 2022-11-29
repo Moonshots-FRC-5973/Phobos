@@ -39,6 +39,18 @@ public class MecanumDrive extends Drivetrain {
             return;
         }
 
+        if (isFieldCentric){
+
+            // We want to adjust by IMU
+
+            double target = Math.atan2(strafe, forward);
+
+            double adjust = target -imu.getZAngle();
+
+            strafe = Math.cos(adjust);
+            forward = Math.sin(adjust);
+        }
+
         // DEADZONES
         if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
             forward = 0.0d;
