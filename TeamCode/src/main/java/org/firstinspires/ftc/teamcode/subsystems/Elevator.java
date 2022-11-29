@@ -14,5 +14,19 @@ public class Elevator {
         leftArmControl = new SparkMINIMotor(hardwareMap, "left_arm_control", "left_arm_control_encoder");
         rightArmControl = new SparkMINIMotor(hardwareMap, "right_Arm_Control", "right_Arm_Control_Encoder");
     }
-
+    //This stuff is just unfinished
+    // Feel free to finish
+public void raiseElevator(){
+    rightArmControl.setPower();
+    rightArmControl.setTargetPosition();
+    leftArmControl.setPower();
+    leftArmControl.setTargetPosition();
+}
+public void lowerElevator(){
+        rightArmControl.setPower();
+        rightArmControl.setTargetPosition();
+        leftArmControl.setPower();
+        leftArmControl.setTargetPosition();
+}
+public void stopMotors
 }
