@@ -23,7 +23,10 @@ public abstract class Drivetrain {
     }
 
     public double speed = 1;
-    public boolean isFieldCentric = true;
+    protected boolean isFieldCentric = true;
+    public void toggleFieldCentric() {
+        isFieldCentric = !isFieldCentric;
+    }
 
     public Drivetrain(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
         this.imu = new IMU(hardwareMap);
