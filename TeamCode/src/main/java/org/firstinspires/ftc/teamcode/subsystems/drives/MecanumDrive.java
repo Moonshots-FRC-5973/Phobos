@@ -39,18 +39,6 @@ public class MecanumDrive extends Drivetrain {
             return;
         }
 
-        if (isFieldCentric){
-
-            // We want to adjust by IMU
-
-            double target = Math.atan2(strafe, forward);
-
-            double adjust = target -imu.getZAngle();
-
-            strafe = Math.cos(adjust);
-            forward = Math.sin(adjust);
-        }
-
         // DEADZONES
         if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
             forward = 0.0d;
@@ -59,6 +47,15 @@ public class MecanumDrive extends Drivetrain {
             strafe = 0.0d;
             // no strafing? Disable the gyrolock
             gyroLocked = false;
+        }
+
+        if (isFieldCentric){
+            // We want to adjust by IMU
+            double target = Math.atan2(forward, strafe);
+            double temp = forward;
+
+            forward = forward * Math.cos(imu.getZAngle() - target) + strafe * Math.sin(Math.toRadians(imu.getZAngle() - target));
+            strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle() - target)) + strafe * Math.cos(Math.toRadians(imu.getZAngle() - target));
         }
 
         // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE

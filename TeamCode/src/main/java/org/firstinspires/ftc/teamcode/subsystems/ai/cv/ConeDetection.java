@@ -100,7 +100,7 @@ public class ConeDetection {
     public boolean isBlueConeInView(){
         List<Recognition> recognitionList = getRecognitions();
         if(recognitionList == null) {return false;}
-        for(Recognition recognition : recognitionList) {if(recognition.getLabel() == "Blue Cone") {return true}}
+        for(Recognition recognition : recognitionList) {if(recognition.getLabel() == "Blue Cone") {return true;}}
         return false;
     }
 }

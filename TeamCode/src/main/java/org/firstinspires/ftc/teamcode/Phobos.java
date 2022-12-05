@@ -93,6 +93,8 @@ public class Phobos extends OpMode
     @Override
     public void init_loop() {
         //coneDetection.update();
+        telemetry.addData("LSX", gamepad1.left_stick_x);
+        telemetry.update();
     }
 
     /*
