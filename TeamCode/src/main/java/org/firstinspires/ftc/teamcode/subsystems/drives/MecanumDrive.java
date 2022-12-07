@@ -43,19 +43,21 @@ public class MecanumDrive extends Drivetrain {
         if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
             forward = 0.0d;
         }
-        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
-            strafe = 0.0d;
-            // no strafing? Disable the gyrolock
-            gyroLocked = false;
-        }
 
         if (isFieldCentric){
             // We want to adjust by IMU
             double target = Math.atan2(forward, strafe);
             double temp = forward;
 
-            forward = forward * Math.cos(imu.getZAngle() - target) + strafe * Math.sin(Math.toRadians(imu.getZAngle() - target));
-            strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle() - target)) + strafe * Math.cos(Math.toRadians(imu.getZAngle() - target));
+            forward = forward * Math.cos(Math.toRadians(imu.getZAngle())) + strafe * Math.sin(Math.toRadians(imu.getZAngle()));
+            strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
+        }
+
+        // Strafe check
+        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
+            strafe = 0.0d;
+            // no strafing? Disable the gyrolock
+            gyroLocked = false;
         }
 
         // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE
