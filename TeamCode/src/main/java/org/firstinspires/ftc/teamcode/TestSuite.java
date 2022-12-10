@@ -5,6 +5,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevSPARKMini;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 
 //Test Suite Code. Testing Swerve drive
 @TeleOp(name="Test Suite", group="TeleOp")
+@Disabled
 public class TestSuite extends OpMode {
     private DcMotorSimple armMotor1;
     private DigitalChannel armMotorEncoder1;

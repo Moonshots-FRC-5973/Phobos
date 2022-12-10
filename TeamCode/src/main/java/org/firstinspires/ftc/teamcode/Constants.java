@@ -19,14 +19,12 @@ public class Constants {
     // Minimum input for the subsystem to respond
     public static final double DRIVE_INPUT_THRESHOLD = 0.15;
     public static final double DRIVE_MOTOR_MAX_SPEED = 0.75;
-    public static final double DRIVE_PID_KP = 1 / 45;
-    public static final double DRIVE_PID_KI = 1;
-    public static final double DRIVE_PID_KD = 1;
 
     // ________________
     // ----  ClAW  ----
-    public static final int CLAW_OPENED_POSITION = 100;
-    public static final double CLAW_MOTOR_POWER = 0.7;
+    public static final int CLAW_OPENED_POSITION = -20;
+    public static final int CLAW_CLOSED_POSITION = 0;
+    public static final double CLAW_MOTOR_POWER = 0.5;
 
     // ________________
     // ---  SERVOS  ---

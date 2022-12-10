@@ -39,9 +39,17 @@ public class MecanumDrive extends Drivetrain {
             return;
         }
 
+        if(telemetry != null) {
+            telemetry.addData("IMU", "Acceleration(%f, %f, %f)", imu.getXVelocity(), imu.getYVelocity(), imu.getZVelocity());
+        }
+
         // DEADZONES
         if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
             forward = 0.0d;
+        }
+
+        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
+            strafe = 0.0d;
         }
 
         if (isFieldCentric){
@@ -53,15 +61,14 @@ public class MecanumDrive extends Drivetrain {
             strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
         }
 
-        // Strafe check
-        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
-            strafe = 0.0d;
-            // no strafing? Disable the gyrolock
-            gyroLocked = false;
-        }
-
         // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE
         if (Math.abs(turn) >= Constants.DRIVE_INPUT_THRESHOLD) {
+            /*
+            double xBoost = 0.0d; // Determine which Axes go to which direction. Only two are needed.
+            double yBoost = 0.0d;
+            double zBoost = 0.0d;
+             */
+
             drive(turn, turn, -turn, turn);
             gyroLocked = false;
             return;
@@ -132,9 +139,5 @@ public class MecanumDrive extends Drivetrain {
         // As we approach the angle, we need to slow down the rotation
         double power = Range.clip(-error / 360, -0.5, 0.5);
         drive(power, power, -power, power);
-    }
-
-    public void turnRobotByDegree(double target) {
-        turnRobotToAngle(imu.getZAngle() + target);
     }
 }

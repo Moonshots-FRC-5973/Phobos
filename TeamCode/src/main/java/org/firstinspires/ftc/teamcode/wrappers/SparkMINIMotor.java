@@ -22,24 +22,28 @@ public class SparkMINIMotor {
     }
 
     public void update() {
-        if(Math.abs(position - target) <= Constants.DRIVE_ANGLE_TOLERANCE) {
-            target = position;
-            power = 0.0d;
-        }
 
+        // hold the given position
         if(encoder.getState() != prevState) {
-            if(power > 0) {
+            if(position < target) {
                 position++;
             } else {
                 position--;
             }
         }
 
-        if(position > target) {
-            motor.setPower(-power);
-        } else {
-            motor.setPower(power);
+        if(Math.abs(position - target) <= 10) {
+            target = position;
+            power = 0.0d;
         }
+
+        if(position > target) {
+            motor.setPower(-Math.abs(power));
+        } else {
+            motor.setPower(Math.abs(power));
+        }
+
+        prevState = encoder.getState();
     }
 
     public void setTargetPosition(int position) {
@@ -55,6 +59,7 @@ public class SparkMINIMotor {
     }
 
     public void close() {
+        this.setPower(0);
         motor.close();
         encoder.close();
     }

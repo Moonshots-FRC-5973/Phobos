@@ -38,6 +38,7 @@ public abstract class Drivetrain {
     public abstract void drive(double m1, double m2, double m3, double m4);
     public abstract void resetWheels();
     public abstract void turnRobotToAngle(double target);
+    public void turnRobotByDegree(double target) { turnRobotToAngle(imu.getZAngle() + target); }
     public void stop() {
         drive(0.0d, 0.0d, 0.0d, 0.0d);
     }

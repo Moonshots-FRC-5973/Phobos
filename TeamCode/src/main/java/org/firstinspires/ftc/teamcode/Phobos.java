@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
@@ -65,7 +66,8 @@ public class Phobos extends OpMode
     // SUBSYSTEMS
     private Drivetrain drive;
     private ConeDetection coneDetection;
-    private Claw claw;
+    //private Claw claw;
+    private Elevator elevator;
 
 
     /*
@@ -79,6 +81,7 @@ public class Phobos extends OpMode
 
         // INIT SUBSYSTEMS
         //claw = new Claw(hardwareMap, telemetry);
+        elevator = new Elevator(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, runtime, telemetry);
 
         //Send the telemetry info pieces to the DS / Dashboard
@@ -93,7 +96,8 @@ public class Phobos extends OpMode
     @Override
     public void init_loop() {
         //coneDetection.update();
-        telemetry.addData("LSX", gamepad1.left_stick_x);
+        telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
+        telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
         telemetry.update();
     }
 
@@ -113,25 +117,23 @@ public class Phobos extends OpMode
         telemetry.addData("Runtime", runtime.seconds());
 
         // DRIVE CONTROLS
+        // Comment out the below line to not have the robot drive around.
         driver1Inputs();
+
         // CLAW CONTROLS
-        if(gamepad2.right_bumper) {
-            telemetry.addData("Arm", "Raising");
-            //claw.raiseArm();
-        } else if(gamepad2.left_bumper) {
-            telemetry.addData("Arm", "Lowering");
-            //claw.lowerArm();
-        } else {
-            telemetry.addData("Arm", "No Input");
-        }
+        driver2Inputs();
+
         telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
         //claw.update();
+        elevator.update();
         telemetry.update();
         //coneDetection.update();
     }
 
-    // Sorry Mr. A, this is the only way I can get the control flow right.
-    public void driver1Inputs() {
+    /**
+     * gamepad1: responsible for the drive System, movement, control speed, etc.
+     */
+    private void driver1Inputs() {
         if (gamepad1.left_stick_button) {
             telemetry.addData("Drive", "Resetting wheels");
             drive.resetWheels();
@@ -152,12 +154,12 @@ public class Phobos extends OpMode
                 drive.turnRobotToAngle(0);
             }
         } else if(turnDown) {
-            telemetry.addData("Drive", "Turning to the reverse of start");
             if (turnRight) {
                 drive.turnRobotToAngle(-135);
             } else if (turnLeft) {
                 drive.turnRobotToAngle(135);
             } else {
+                telemetry.addData("Drive", "Turning to the reverse of start");
                 drive.turnRobotToAngle(180);
             }
         } else if(turnRight) {
@@ -171,6 +173,26 @@ public class Phobos extends OpMode
         }
         if(gamepad1.a) {
             drive.toggleFieldCentric();
+        }
+    }
+
+    /**
+     * gamepad2: Responsible for claw and vision processing controls
+     */
+    private void driver2Inputs() {
+        if(gamepad2.right_bumper) {
+            telemetry.addData("Arm", "Raising");
+            //claw.raiseArm();
+            elevator.raiseElevator();
+        } else if(gamepad2.left_bumper) {
+            telemetry.addData("Arm", "Lowering");
+            //claw.lowerArm();
+            elevator.lowerElevator();
+        } else if(gamepad2.a) {
+            telemetry.addData("Arm", "Resetting");
+            elevator.resetArm();
+        } else {
+            telemetry.addData("Arm", "No Input");
         }
     }
 
