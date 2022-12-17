@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.ai.cv;
 
+import android.service.autofill.RegexValidator;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -16,24 +18,17 @@ import java.util.List;
 public class ConeDetection {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tflite;
-    private FtcDashboard ftcDashboard;
-    private Telemetry telemetry;
 
-    public Telemetry getTelemetry() {
-        return telemetry;
-    }
+    public enum SignalStatus {
+        SIDE_1,
+        SIDE_2,
+        SIDE_3,
+        ERROR
+    };
 
-    public ConeDetection(HardwareMap hardwareMap) {
-        // Init FTCDashboard
-        ftcDashboard = FtcDashboard.getInstance();
-        if(ftcDashboard == null) {
-            throw new NullPointerException("FTCDashboard instance was null after creation");
-        }
-        telemetry = ftcDashboard.getTelemetry();
-        if(telemetry == null) {
-            throw new NullPointerException("FTCDashboard Telemetry was null after creation");
-        }
+    public SignalStatus status;
 
+    public ConeDetection(HardwareMap hardwareMap, Telemetry telemetry) {
         //Init Vuforia (required apparently? idk)
         VuforiaLocalizer.Parameters vuParams = new VuforiaLocalizer.Parameters(hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()));
         vuParams.vuforiaLicenseKey = Constants.OD_VUFORIA_KEY;
@@ -41,35 +36,49 @@ public class ConeDetection {
         vuforia = ClassFactory.getInstance().createVuforia(vuParams);
 
         // Put the camera on the FTC Dashboard
-        ftcDashboard.startCameraStream(vuforia, 30);
+        FtcDashboard.getInstance().startCameraStream(vuforia, 30);
 
         //Init TFLite
-        TFObjectDetector.Parameters tfliteParams = new TFObjectDetector.Parameters();
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfliteParams = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfliteParams.minResultConfidence = 0.75f;
         tfliteParams.isModelTensorFlow2 = true;
         tfliteParams.inputSize = 300;
         tflite = ClassFactory.getInstance().createTFObjectDetector(tfliteParams, vuforia);
 
-        try {
-            tflite.loadModelFromAsset(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
-        } catch(Exception e) {
-            try {
-                tflite.loadModelFromFile(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
-            } catch(Exception exception) {
-                telemetry.addData("TFLite", "No Model Loaded");
-            }
-        }
+        tflite.loadModelFromFile(Constants.OD_RES_MAIN_TFLITE, Constants.OD_LABELS);
+        telemetry.addData("tflite-init", "Model Loaded from file");
 
-        if(tflite == null) {
-            throw new ExceptionInInitializerError("TFLite object was null after creation");
-        }
-        tflite.activate();
+
+        if (tflite != null) tflite.activate();
+        else telemetry.addData("tflite-init", "NULL");
+
+        telemetry.addData("tflite-init", "Activated");
         tflite.setZoom(1.0, 16.0/9.0);
-    }
+        telemetry.addData("tflite-init", "Zoom set");
 
-    public void update() {
-        telemetry.addData("TFLite", this.toString());
-        telemetry.update();
+        /*// can we get the weighted probality of recongnition... not just first one
+        for(Recognition r: rList) {
+            switch(r.getLabel()) {
+                case "Side 1":
+                    this.status = SignalStatus.SIDE_1;
+                    break;
+                case "Side 2":
+                    this.status = SignalStatus.SIDE_2;
+                    break;
+                case "Side 3":
+                    this.status = SignalStatus.SIDE_3;
+                default:
+                    this.status = SignalStatus.ERROR;
+            }
+            if(this.status != SignalStatus.ERROR) {
+                break;
+            }
+
+        }
+
+         */
     }
 
     public List<Recognition> getRecognitions() {
@@ -103,4 +112,6 @@ public class ConeDetection {
         for(Recognition recognition : recognitionList) {if(recognition.getLabel() == "Blue Cone") {return true;}}
         return false;
     }
+
+
 }

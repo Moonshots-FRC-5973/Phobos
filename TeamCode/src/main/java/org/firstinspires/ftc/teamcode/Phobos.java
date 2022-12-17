@@ -33,6 +33,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
@@ -66,8 +68,13 @@ public class Phobos extends OpMode
     // SUBSYSTEMS
     private Drivetrain drive;
     private ConeDetection coneDetection;
-    //private Claw claw;
-    private Elevator elevator;
+    private Claw clawyMcClawClawferson;
+    //private Elevator elevator;
+    private DigitalChannel limSwitch;
+
+    // Input state holders
+    private boolean gp2bPressed = false;
+
 
 
     /*
@@ -80,9 +87,10 @@ public class Phobos extends OpMode
         //coneDetection = new ConeDetection(hardwareMap);
 
         // INIT SUBSYSTEMS
-        //claw = new Claw(hardwareMap, telemetry);
-        elevator = new Elevator(hardwareMap, telemetry);
-        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
+        clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
+        //elevator = new Elevator(hardwareMap, telemetry);
+        //drive = new MecanumDrive(hardwareMap, runtime, telemetry);
+        limSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
         //Send the telemetry info pieces to the DS / Dashboard
         // Tell the driver that initialization is complete.
@@ -99,6 +107,15 @@ public class Phobos extends OpMode
         telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
         telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
         telemetry.update();
+/*
+        // Limit Switch is true when not hit
+        if(!limSwitch.getState()) {
+            clawyMcClawClawferson.setEncoderOffset();
+        } else {
+            clawyMcClawClawferson.lowerClawBySpeed(-0.1);
+        }
+
+ */
     }
 
     /*
@@ -118,14 +135,15 @@ public class Phobos extends OpMode
 
         // DRIVE CONTROLS
         // Comment out the below line to not have the robot drive around.
-        driver1Inputs();
+        //driver1Inputs();
 
         // CLAW CONTROLS
         driver2Inputs();
 
-        telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
-        //claw.update();
-        elevator.update();
+
+        telemetry.addData("Arm", clawyMcClawClawferson.getCurrentHeight());
+        //telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
+        //elevator.update();
         telemetry.update();
         //coneDetection.update();
     }
@@ -144,6 +162,7 @@ public class Phobos extends OpMode
         boolean turnDown = (gamepad1.dpad_down && !gamepad1.dpad_up);
         boolean turnLeft = (gamepad1.dpad_left && !gamepad1.dpad_right);
         boolean turnRight = (gamepad1.dpad_right && !gamepad1.dpad_left);
+
         if(turnUp) {
             telemetry.addData("Drive", "Turning back to original front");
             if(turnRight) {
@@ -180,20 +199,25 @@ public class Phobos extends OpMode
      * gamepad2: Responsible for claw and vision processing controls
      */
     private void driver2Inputs() {
-        if(gamepad2.right_bumper) {
-            telemetry.addData("Arm", "Raising");
-            //claw.raiseArm();
-            elevator.raiseElevator();
-        } else if(gamepad2.left_bumper) {
-            telemetry.addData("Arm", "Lowering");
-            //claw.lowerArm();
-            elevator.lowerElevator();
-        } else if(gamepad2.a) {
-            telemetry.addData("Arm", "Resetting");
-            elevator.resetArm();
-        } else {
-            telemetry.addData("Arm", "No Input");
+        if(gamepad2.dpad_up) {
+            clawyMcClawClawferson.setHigh();
+        } else if(gamepad2.dpad_left) {
+            clawyMcClawClawferson.setMid();
+        } else if(gamepad2.dpad_down) {
+            clawyMcClawClawferson.setLow();
+        } else if(gamepad2.dpad_right){
+            clawyMcClawClawferson.setMin();
         }
+
+        if(gamepad2.b && !gp2bPressed && !gamepad2.start) {
+            if(clawyMcClawClawferson.getStatus() == Claw.Status.CLOSE) {
+                clawyMcClawClawferson.open();
+            } else {
+                clawyMcClawClawferson.close();
+            }
+        }
+
+        gp2bPressed = gamepad2.b;
     }
 
     /*

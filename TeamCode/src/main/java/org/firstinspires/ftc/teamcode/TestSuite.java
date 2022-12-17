@@ -1,59 +1,43 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.rev.RevSPARKMini;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.subsystems.ai.cv.Camera;
-import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
+import org.checkerframework.checker.units.qual.C;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 
-//Test Suite Code. Testing Swerve drive
+import java.util.List;
+
+//Test Suite Code.
 @TeleOp(name="Test Suite", group="TeleOp")
-@Disabled
 public class TestSuite extends OpMode {
-    private DcMotorSimple armMotor1;
-    private DigitalChannel armMotorEncoder1;
-    private int armPosition1 = 0;
-    private boolean prevState1;
-    private DcMotorSimple armMotor2;
-    private DigitalChannel armMotorEncoder2;
-    private int armPosition2 = 0;
-    private boolean prevState2;
 
-    private DcMotor leftFrontDrive;
-    private DcMotor leftBackDrive;
+    private DigitalChannel limSwitch;
 
-    /**
-     * User defined init method
-     * <p>
-     * This method will be called once when the INIT button is pressed.
-     */
     @Override
     public void init() {
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_drive_front");
-//        leftFrontDrive.setMode(RUN_USING_ENCODER);
-        leftBackDrive = hardwareMap.get(DcMotor.class, "left_drive_back");
-//        leftBackDrive.setMode(RUN_USING_ENCODER);
+        limSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
+        limSwitch.setMode(DigitalChannel.Mode.INPUT);
+    }
 
-        //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-//        armMotor1 = hardwareMap.get(DcMotorSimple.class, "arm_drive_left");
-//        armMotorEncoder1 = hardwareMap.get(DigitalChannel.class, "arm_motor_encoder_left");
-//        prevState1 = armMotorEncoder1.getState();
-//
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-//        armMotor2 = hardwareMap.get(DcMotorSimple.class, "arm_drive_right");
-//        armMotorEncoder2 = hardwareMap.get(DigitalChannel.class, "arm_motor_encoder_right");
-//        prevState2 = armMotorEncoder2.getState();
+    @Override
+    public void init_loop() {
+        telemetry.addData("lim", limSwitch.getState());
+    }
+
+    public void start() {
+
     }
 
     /**
@@ -64,40 +48,9 @@ public class TestSuite extends OpMode {
     @Override
     public void loop() {
 
-        leftFrontDrive.setPower(Range.clip(gamepad1.left_stick_y, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
-        leftBackDrive.setPower(Range.clip(gamepad1.left_stick_y, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
-
-        //telemetry.addData("LSY", gamepad1.left_stick_y);
-//        armMotor1.setPower(Range.clip(gamepad1.left_stick_y,
-//               -Constants.DRIVE_MOTOR_MAX_SPEED,
-//               Constants.DRIVE_MOTOR_MAX_SPEED
-//        ));
-//        armMotor2.setPower(Range.clip(gamepad1.left_stick_y,
-//                -Constants.DRIVE_MOTOR_MAX_SPEED,
-//                Constants.DRIVE_MOTOR_MAX_SPEED
-//        ));
-//
-//        if(armMotorEncoder1.getState() != prevState1) {
-//            if(gamepad1.left_stick_y >= 0)
-//                armPosition1++;
-//            else
-//                armPosition1--;
-//        }
-//        if(armMotorEncoder2.getState() != prevState2) {
-//            if(gamepad1.left_stick_y >= 0)
-//                armPosition2++;
-//            else
-//                armPosition2--;
-//        }
-
-//        prevState1 = armMotorEncoder1.getState();
-//        telemetry.addData("Encoder Value", armPosition1);
-//        telemetry.addData("Encoder Value", armPosition2);
     }
 
     @Override
     public void stop() {
-//        armMotor1.setPower(0.0d);
-//        armMotor2.setPower(0.0d);
     }
 }

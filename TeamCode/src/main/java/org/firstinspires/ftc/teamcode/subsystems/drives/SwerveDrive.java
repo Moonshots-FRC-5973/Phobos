@@ -5,10 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.wrappers.IMU;
 
 public class SwerveDrive extends Drivetrain {
     public final DcMotor leftMotorLeft;   // +Power = left wheel turning left
@@ -72,14 +70,14 @@ public class SwerveDrive extends Drivetrain {
     }
 
     public void drive(double forward, double strafe, double turn) {
-        if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
+        if(Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
             forward = 0.0d;
         }
-        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
+        if(Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
             strafe = 0.0d;
         }
 
-        if(Math.abs(turn) >= Constants.DRIVE_INPUT_THRESHOLD) {
+        if(Math.abs(turn) >= Constants.INPUT_THRESHOLD) {
             drive((-turn * getSpeed()), (-turn * getSpeed()), (turn * getSpeed()), (turn * getSpeed()));
             return;
         }

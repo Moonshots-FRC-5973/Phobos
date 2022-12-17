@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
 public class Constants {
+    // _______________
+    // --  GENERAL  --
+    public static final double INPUT_THRESHOLD = 0.15;
 
     // _______________
     // ---  DRIVE  ---
@@ -17,18 +20,30 @@ public class Constants {
     @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
     // Minimum input for the subsystem to respond
-    public static final double DRIVE_INPUT_THRESHOLD = 0.15;
     public static final double DRIVE_MOTOR_MAX_SPEED = 0.75;
 
     // ________________
+    // ----  ARM   ----
+    public static final int ARM_DOWN_POSITION = 0;
+    public static final int ARM_LOW_POSITION = 500;
+    public static final int ARM_MID_POSITION = 500;
+    public static final int ARM_HIGH_POSITION = 500;
+    public static final double ARM_MOTOR_POWER = 0.9;
+
+    // ________________
     // ----  ClAW  ----
-    public static final int CLAW_OPENED_POSITION = -20;
+    public static final int CLAW_OPENED_POSITION = 1;
     public static final int CLAW_CLOSED_POSITION = 0;
-    public static final double CLAW_MOTOR_POWER = 0.5;
+    public static final double CLAW_HEIGHT_MID_POSITION = 0.9;
+    public static final double CLAW_HEIGHT_LOW_POSITION = 0.85;
+    public static final double CLAW_HEIGHT_MAX_POSITION = 1;
+    public static final double CLAW_HEIGHT_MIN_POSITION = .9;
+
 
     // ________________
     // ---  SERVOS  ---
     public static final String ARM_SERVO_NAME = "servo0";
+    public static final double ARM_SERVO_INCREMENT = 0.01;
 
     // ________________
     // ---  SENSOR  ---
@@ -42,8 +57,9 @@ public class Constants {
     // ________________
     // OBJECT_DETECTION
     public static final String OD_VUFORIA_KEY = "AS6a0rf/////AAABmQTWiptCrE+LufdlUzBT8weOkDKTan22xYq7kRmbpkAd2B1wy+uBaVuTdp4ngclG4NG6WQ8+8+nnRd+v6OB5Gzm+jMMh02iC+WrML6/2ArgWlM1vh43nEyfKOaOyJ4uZYqKMNAEcXqNLKK2+PdtmQQgiwGhna/VKV/Qdkhwsxt6w+4VGETJJwxT8k+tXTal2DGF5Sr9c69Lz0O0drCDZ2+ZUtuhOn1X+dkVoGxAoqSh/sYiqssxEtfGaf551TQytAXNBpbMgYXNGRSR6WAke2lVC4BxEowhiacPiZDLOZgVrHPc0bJbtN2kIF3OWk/FHj3tuHQ6seHZR4cU/6S7AeP3PaBwnYKbFvg8svUAy3vxD";
-    public static final String OD_RES_MAIN_TFLITE = "res/main.tflite";
+    public static final String OD_RES_MAIN_TFLITE = "signal.tflite";
     public static final String[] OD_LABELS = {
-            ""
+            "Side 1",
+            "Side 2",
     };
 }

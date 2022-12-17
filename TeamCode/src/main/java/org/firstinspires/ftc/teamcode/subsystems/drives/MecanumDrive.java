@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.drives;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -44,11 +43,11 @@ public class MecanumDrive extends Drivetrain {
         }
 
         // DEADZONES
-        if(Math.abs(forward) <= Constants.DRIVE_INPUT_THRESHOLD) {
+        if(Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
             forward = 0.0d;
         }
 
-        if(Math.abs(strafe) <= Constants.DRIVE_INPUT_THRESHOLD) {
+        if(Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
             strafe = 0.0d;
         }
 
@@ -62,7 +61,7 @@ public class MecanumDrive extends Drivetrain {
         }
 
         // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE
-        if (Math.abs(turn) >= Constants.DRIVE_INPUT_THRESHOLD) {
+        if (Math.abs(turn) >= Constants.INPUT_THRESHOLD) {
             /*
             double xBoost = 0.0d; // Determine which Axes go to which direction. Only two are needed.
             double yBoost = 0.0d;

@@ -38,8 +38,8 @@ public class Elevator {
     // Need to call update() to ensure the Sparks hit the right values
     public void update() {
         double boost = (rightArmControl.getEncoderPosition() - leftArmControl.getEncoderPosition()) / 50;
-        rightArmControl.setPower(Range.clip(Constants.CLAW_MOTOR_POWER - boost, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
-        leftArmControl.setPower(Range.clip(Constants.CLAW_MOTOR_POWER + boost, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
+        rightArmControl.setPower(Range.clip(Constants.ARM_MOTOR_POWER - boost, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
+        leftArmControl.setPower(Range.clip(Constants.ARM_MOTOR_POWER + boost, -Constants.DRIVE_MOTOR_MAX_SPEED, Constants.DRIVE_MOTOR_MAX_SPEED));
         leftArmControl.update();
         rightArmControl.update();
         telemetry.addData("LeftArmMotor", leftArmControl.getEncoderPosition());
