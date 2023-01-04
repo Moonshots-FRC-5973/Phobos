@@ -25,19 +25,19 @@ public class Constants {
     // ________________
     // ----  ARM   ----
     public static final int ARM_DOWN_POSITION = 0;
-    public static final int ARM_LOW_POSITION = 500;
-    public static final int ARM_MID_POSITION = 500;
-    public static final int ARM_HIGH_POSITION = 500;
+    public static final int ARM_LOW_POSITION = 400;
+    public static final int ARM_MID_POSITION = 550;
+    public static final int ARM_HIGH_POSITION = 800;
     public static final double ARM_MOTOR_POWER = 0.9;
 
     // ________________
     // ----  ClAW  ----
     public static final int CLAW_OPENED_POSITION = 1;
     public static final int CLAW_CLOSED_POSITION = 0;
-    public static final double CLAW_HEIGHT_MID_POSITION = 0.4;
-    public static final double CLAW_HEIGHT_LOW_POSITION = 0.25;
-    public static final double CLAW_HEIGHT_MAX_POSITION = .5;
-    public static final double CLAW_HEIGHT_MIN_POSITION = .15;
+    public static final double CLAW_HEIGHT_MID_POSITION = 0.45;
+    public static final double CLAW_HEIGHT_LOW_POSITION = 0.4;
+    public static final double CLAW_HEIGHT_MAX_POSITION = .6;
+    public static final double CLAW_HEIGHT_MIN_POSITION = .25;
 
     // ________________
     // ---  SERVOS  ---
