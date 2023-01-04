@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
-import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 
 import java.util.List;
 

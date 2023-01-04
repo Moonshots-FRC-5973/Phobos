@@ -39,7 +39,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
-import org.firstinspires.ftc.teamcode.subsystems.ai.cv.ConeDetection;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
@@ -67,10 +66,8 @@ public class Phobos extends OpMode
     // ----------
     // SUBSYSTEMS
     private Drivetrain drive;
-    private ConeDetection coneDetection;
     private Claw clawyMcClawClawferson;
     //private Elevator elevator;
-    private DigitalChannel limSwitch;
 
     // Input state holders
     private boolean gp2bPressed = false;
@@ -89,13 +86,14 @@ public class Phobos extends OpMode
         // INIT SUBSYSTEMS
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
         //elevator = new Elevator(hardwareMap, telemetry);
-        //drive = new MecanumDrive(hardwareMap, runtime, telemetry);
-        limSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
+        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
 
         //Send the telemetry info pieces to the DS / Dashboard
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+
     }
 
     /*
@@ -116,6 +114,7 @@ public class Phobos extends OpMode
         }
 
  */
+
     }
 
     /*
@@ -135,14 +134,14 @@ public class Phobos extends OpMode
 
         // DRIVE CONTROLS
         // Comment out the below line to not have the robot drive around.
-        //driver1Inputs();
+        driver1Inputs();
 
         // CLAW CONTROLS
         driver2Inputs();
 
 
         telemetry.addData("Arm", clawyMcClawClawferson.getCurrentHeight());
-        //telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
+        telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
         //elevator.update();
         telemetry.update();
         //coneDetection.update();

@@ -21,13 +21,13 @@ public class MecanumDrive extends Drivetrain {
     public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
         super(hardwareMap, runtime, telemetry);
 
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_drive_front");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_motor_drive");
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive = hardwareMap.get(DcMotor.class, "left_drive_back");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_motor_drive");
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_drive_front");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_motor_drive");
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive = hardwareMap.get(DcMotor.class,"right_drive_back");
+        rightBackDrive = hardwareMap.get(DcMotor.class,"right_back_motor_drive");
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
@@ -73,7 +73,7 @@ public class MecanumDrive extends Drivetrain {
             return;
         }
         // If we're not turning, lock our gyro to track our intended heading
-        if (! gyroLocked ){
+        if (! gyroLocked ) {
             gyroLocked = true;
             gyroTarget = imu.getZAngle();
         }
@@ -121,6 +121,7 @@ public class MecanumDrive extends Drivetrain {
 
     @Override
     public void turnRobotToAngle(double target) {
+        gyroLocked = false;
         targetHeading = target;
         // Get the error. Positive means we need to rotate to the left
         double error = targetHeading - imu.getZAngle();

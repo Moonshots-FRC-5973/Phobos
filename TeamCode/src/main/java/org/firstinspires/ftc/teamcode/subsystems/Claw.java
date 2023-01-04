@@ -56,10 +56,9 @@ public class Claw {
     public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         clawOpenServo = hardwareMap.servo.get("claw_open_servo");
-        leftArmMotor = hardwareMap.get(DcMotor.class, "left_arm_motor");
-        rightArmMotor = hardwareMap.get(DcMotor.class, "right_arm_motor");
+        leftArmMotor = hardwareMap.get(DcMotor.class, "left_motor_arm");
+        rightArmMotor = hardwareMap.get(DcMotor.class, "right_motor_arm");
         leftClawHeightServo = hardwareMap.get(Servo.class, "left_claw_height_servo");
-        clawOpenServo = hardwareMap.get(Servo.class, "claw_open_servo");
 
         leftArmMotor.setDirection(DcMotor.Direction.FORWARD);
         rightArmMotor.setDirection(DcMotor.Direction.FORWARD);

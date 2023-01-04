@@ -34,11 +34,10 @@ public class Constants {
     // ----  ClAW  ----
     public static final int CLAW_OPENED_POSITION = 1;
     public static final int CLAW_CLOSED_POSITION = 0;
-    public static final double CLAW_HEIGHT_MID_POSITION = 0.9;
-    public static final double CLAW_HEIGHT_LOW_POSITION = 0.85;
-    public static final double CLAW_HEIGHT_MAX_POSITION = 1;
-    public static final double CLAW_HEIGHT_MIN_POSITION = .9;
-
+    public static final double CLAW_HEIGHT_MID_POSITION = 0.4;
+    public static final double CLAW_HEIGHT_LOW_POSITION = 0.25;
+    public static final double CLAW_HEIGHT_MAX_POSITION = .5;
+    public static final double CLAW_HEIGHT_MIN_POSITION = .15;
 
     // ________________
     // ---  SERVOS  ---
@@ -61,5 +60,6 @@ public class Constants {
     public static final String[] OD_LABELS = {
             "Side 1",
             "Side 2",
+            "Side 3"
     };
 }
