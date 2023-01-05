@@ -123,13 +123,21 @@ public class Claw {
         rightArmMotor.setPower(Constants.ARM_MOTOR_POWER);
         rightArmMotor.setTargetPosition(targetPosition + encoderOffset);
         rightArmMotor.setMode(RUN_TO_POSITION);
+
         telemetry.addData("LAM", leftArmMotor.getCurrentPosition());
         telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
         telemetry.addData("Servo Target", armServoPosition);
-        leftClawHeightServo.setPosition(armServoPosition);
+
+        if(leftClawHeightServo.getPosition() >= armServoPosition)
+            leftClawHeightServo.setPosition(armServoPosition);
         clawOpenServo.setPosition(clawServoPosition);
+
         telemetry.addData("Open", clawOpenServo.getPosition());
         telemetry.addData("Open target", clawServoPosition);
+    }
+
+    public void angleClaw() {
+        leftClawHeightServo.setPosition(armServoPosition);
     }
 
     public void lowerClawBySpeed(double speed) {

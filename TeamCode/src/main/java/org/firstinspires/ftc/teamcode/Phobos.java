@@ -216,6 +216,10 @@ public class Phobos extends OpMode
             }
         }
 
+        if(gamepad2.a && !gamepad2.start) {
+            clawyMcClawClawferson.angleClaw();
+        }
+
         gp2bPressed = gamepad2.b;
     }
 
