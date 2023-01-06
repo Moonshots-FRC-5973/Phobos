@@ -33,15 +33,11 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
-import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.drives.SwerveDrive;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -67,12 +63,9 @@ public class Phobos extends OpMode
     // SUBSYSTEMS
     private Drivetrain drive;
     private Claw clawyMcClawClawferson;
-    //private Elevator elevator;
 
     // Input state holders
     private boolean gp2bPressed = false;
-
-
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -81,19 +74,15 @@ public class Phobos extends OpMode
     public void init() {
         // Add the telemetry output to the dashboard
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        //coneDetection = new ConeDetection(hardwareMap);
 
         // INIT SUBSYSTEMS
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
-        //elevator = new Elevator(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, runtime, telemetry);
 
         //Send the telemetry info pieces to the DS / Dashboard
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-
     }
 
     /*
@@ -101,20 +90,9 @@ public class Phobos extends OpMode
      */
     @Override
     public void init_loop() {
-        //coneDetection.update();
         telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
         telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
         telemetry.update();
-/*
-        // Limit Switch is true when not hit
-        if(!limSwitch.getState()) {
-            clawyMcClawClawferson.setEncoderOffset();
-        } else {
-            clawyMcClawClawferson.lowerClawBySpeed(-0.1);
-        }
-
- */
-
     }
 
     /*
@@ -139,12 +117,10 @@ public class Phobos extends OpMode
         // CLAW CONTROLS
         driver2Inputs();
 
-
-        telemetry.addData("Arm", clawyMcClawClawferson.getCurrentHeight());
+        telemetry.addData("ArmLeft", clawyMcClawClawferson.getLeftCurrentHeight());
+        telemetry.addData("ArmRight", clawyMcClawClawferson.getRightCurrentHeight());
         telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
-        //elevator.update();
         telemetry.update();
-        //coneDetection.update();
     }
 
     /**
@@ -156,6 +132,7 @@ public class Phobos extends OpMode
             drive.resetWheels();
             return;
         }
+
         // DPad inputs, checking for overload; control for the drivetrain to rotate the robot
         boolean turnUp = (gamepad1.dpad_up && !gamepad1.dpad_down);
         boolean turnDown = (gamepad1.dpad_down && !gamepad1.dpad_up);
@@ -220,6 +197,14 @@ public class Phobos extends OpMode
             clawyMcClawClawferson.angleClaw();
         }
 
+        if(gamepad2.x) {
+            clawyMcClawClawferson.setEncoderOffset();
+        }
+
+        if(gamepad2.y) {
+            clawyMcClawClawferson.stop();
+        }
+
         gp2bPressed = gamepad2.b;
     }
 
@@ -228,6 +213,7 @@ public class Phobos extends OpMode
      */
     @Override
     public void stop() {
+        clawyMcClawClawferson.stop();
         drive.stop();
     }
 

@@ -20,23 +20,18 @@ public class ColorSensor {
     public double getRed() {
         return colorSensor.getNormalizedColors().red;
     }
-
     public double getGreen() {
         return colorSensor.getNormalizedColors().green;
     }
-
     public double getBlue() {
         return colorSensor.getNormalizedColors().blue;
     }
-
     public boolean isRed() {
         return (getRed() > getGreen() && getRed() > getBlue());
     }
-
     public boolean isGreen() {
         return (getGreen() > getRed() && getGreen() > getBlue());
     }
-
     public boolean isBlue() {
         return (getBlue() > getRed() && getBlue() > getGreen());
     }

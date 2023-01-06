@@ -34,11 +34,40 @@ public abstract class Drivetrain {
         this.telemetry = telemetry;
     }
 
+    /**
+     * @param forward a double to move in the forward direction
+     * @param strafe a double to move in the horizontal direction
+     * @param turn a double representing the speed to change the heading
+     */
     public abstract void drive(double forward, double strafe, double turn);
+
+    /**
+     * @param m1 motor power level 1
+     * @param m2 motor power level 2
+     * @param m3 motor power level 3
+     * @param m4 motor power level 4
+     */
     public abstract void drive(double m1, double m2, double m3, double m4);
+
+    /**
+     * DEPRECEATED: There is no reason to use this
+     */
+    @Deprecated
     public abstract void resetWheels();
+
+    /**
+     * @param target the absolute angle to move to
+     */
     public abstract void turnRobotToAngle(double target);
+
+    /**
+     * @param target The angle to adjust the current angle by
+     */
     public void turnRobotByDegree(double target) { turnRobotToAngle(imu.getZAngle() + target); }
+
+    /**
+     * Stops the drive from moving
+     */
     public void stop() {
         drive(0.0d, 0.0d, 0.0d, 0.0d);
     }

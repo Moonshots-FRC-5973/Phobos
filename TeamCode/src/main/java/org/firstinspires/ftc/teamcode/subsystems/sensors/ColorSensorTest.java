@@ -69,8 +69,6 @@ public class ColorSensorTest extends LinearOpMode {
 
         // While the Op Mode is running, update the telemetry values.
         while (opModeIsActive()) {
-
-
             myMotor.setPower(.75);
             telemetry.addData("Red", color.red());
             telemetry.addData("Green", color.green());
