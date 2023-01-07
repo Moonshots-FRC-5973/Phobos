@@ -33,7 +33,7 @@ public class DummyAutoRight extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        while(opModeIsActive() && runtime.seconds() <= 1) {
+        while(opModeIsActive() && runtime.seconds() <= 2) {
             drive.drive(0.0d, 0.5d, 0.0d);
         }
     }
