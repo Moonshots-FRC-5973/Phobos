@@ -234,6 +234,12 @@ public class Claw {
         run();
     }
 
+    public void adjustClawAngle(double change){
+        armServoPosition += change;
+        position = Position.CUSTOM;
+        run();
+    }
+
     /**
      * Stops the motors
      */
