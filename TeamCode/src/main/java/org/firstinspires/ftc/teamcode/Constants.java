@@ -10,7 +10,7 @@ public class Constants {
     // _______________
     // ---  DRIVE  ---
     // Precision of the subsystem approaching an angle
-    public static final double DRIVE_ANGLE_TOLERANCE = 1;
+    public static final double DRIVE_ANGLE_TOLERANCE = 5;
     // motor names
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
@@ -20,24 +20,26 @@ public class Constants {
     @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
     // Minimum input for the subsystem to respond
-    public static final double DRIVE_MOTOR_MAX_SPEED = 0.75;
+    public static final double DRIVE_MOTOR_MAX_SPEED = 0.3;
 
     // ________________
     // ----  ARM   ----
     public static final int ARM_DOWN_POSITION = 0;
-    public static final int ARM_LOW_POSITION = 400;
+    public static final int ARM_LOW_POSITION = 300;
     public static final int ARM_MID_POSITION = 550;
     public static final int ARM_HIGH_POSITION = 800;
+    public static final int ARM_PICKUP_POSITION = 150;
     public static final double ARM_MOTOR_POWER = 0.75;
 
     // ________________
     // ----  ClAW  ----
-    public static final int CLAW_OPENED_POSITION = 1;
-    public static final int CLAW_CLOSED_POSITION = 0;
+    public static final double CLAW_OPENED_POSITION = 0.3;
+    public static final double CLAW_CLOSED_POSITION = 0;
     public static final double CLAW_HEIGHT_MID_POSITION = 0.45;
     public static final double CLAW_HEIGHT_LOW_POSITION = 0.4;
     public static final double CLAW_HEIGHT_MAX_POSITION = .6;
-    public static final double CLAW_HEIGHT_MIN_POSITION = .25;
+    public static final double CLAW_HEIGHT_MIN_POSITION = .27;
+    public static final double CLAW_HEIGHT_PICKUP_POSITION = .5;
 
     // ________________
     // ---  SERVOS  ---

@@ -22,7 +22,9 @@ public class Claw {
         MIN,
         LOW,
         MID,
-        HIGH
+        HIGH,
+        PICKUP,
+        CUSTOM
     }
 
     /**
@@ -50,8 +52,16 @@ public class Claw {
      * Activates the movement of the arm
      */
     private void run() {
+        if(position == Position.MIN) {
+            leftArmMotor.setMode(RUN_WITHOUT_ENCODER);
+            rightArmMotor.setMode(RUN_WITHOUT_ENCODER);
+        }
         //Adjust power based on arm target position
         switch (position) {
+            case MIN:
+                leftArmMotor.setPower(0.0d);
+                rightArmMotor.setPower(0.0d);
+                break;
             case LOW:
                 leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.1);
                 rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.1);
@@ -68,11 +78,12 @@ public class Claw {
                 leftArmMotor.setPower(Constants.ARM_MOTOR_POWER);
                 rightArmMotor.setPower(Constants.ARM_MOTOR_POWER);
         }
-
-        leftArmMotor.setTargetPosition(targetPosition + leftEncoderOffset);
-        leftArmMotor.setMode(RUN_TO_POSITION);
-        rightArmMotor.setTargetPosition(targetPosition + rightEncoderOffset);
-        rightArmMotor.setMode(RUN_TO_POSITION);
+        if(position != Position.MIN) {
+            leftArmMotor.setTargetPosition(targetPosition + leftEncoderOffset);
+            leftArmMotor.setMode(RUN_TO_POSITION);
+            rightArmMotor.setTargetPosition(targetPosition + rightEncoderOffset);
+            rightArmMotor.setMode(RUN_TO_POSITION);
+        }
 
         telemetry.addData("LAM", leftArmMotor.getCurrentPosition());
         telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
@@ -139,6 +150,7 @@ public class Claw {
         leftClawHeightServo.setPosition(0);
         clawOpenServo.setPosition(Constants.CLAW_CLOSED_POSITION);
         position = Position.MIN;
+        setEncoderOffset();
     }
 
     /**
@@ -148,6 +160,13 @@ public class Claw {
         targetPosition = Constants.ARM_DOWN_POSITION;
         armServoPosition = Constants.CLAW_HEIGHT_MIN_POSITION;
         position = Position.MIN;
+        run();
+    }
+
+    public void setGroundPickup() {
+        targetPosition = Constants.ARM_PICKUP_POSITION;
+        armServoPosition = Constants.CLAW_HEIGHT_PICKUP_POSITION;
+        position = Position.PICKUP;
         run();
     }
 
@@ -210,10 +229,9 @@ public class Claw {
      * @param speed Adjusts the claw based on speed instead of by encoder
      */
     public void lowerClawBySpeed(double speed) {
-        leftArmMotor.setMode(RUN_USING_ENCODER);
-        rightArmMotor.setMode(RUN_USING_ENCODER);
-        leftArmMotor.setPower(speed);
-        rightArmMotor.setPower(speed);
+        targetPosition += speed * 10;
+        position = Position.CUSTOM;
+        run();
     }
 
     /**

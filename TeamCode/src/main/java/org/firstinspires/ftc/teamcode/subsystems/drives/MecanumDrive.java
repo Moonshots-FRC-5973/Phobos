@@ -31,7 +31,15 @@ public class MecanumDrive extends Drivetrain {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    /**
+     * Consider conditions and calculate the motion for the drivetrain
+     * @param forward a double to move in the forward direction
+     * @param strafe a double to move in the horizontal direction
+     * @param turn a double representing the speed to change the heading
+     */
     public void drive(double forward, double strafe, double turn) {
+
+        // LET'S DISCUSS THIS: Driver should be able to override turnToAngle
         // If we're turning to an angle, continue turning to the angle and ignore drive inputs.
         if(turningToAngle) {
             turnRobotToAngle(targetHeading);
@@ -42,11 +50,11 @@ public class MecanumDrive extends Drivetrain {
             telemetry.addData("IMU", "Acceleration(%f, %f, %f)", imu.getXVelocity(), imu.getYVelocity(), imu.getZVelocity());
         }
 
+        // ---------
         // DEADZONES
         if(Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
             forward = 0.0d;
         }
-
         if(Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
             strafe = 0.0d;
         }
@@ -60,6 +68,7 @@ public class MecanumDrive extends Drivetrain {
             strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
         }
 
+        // ROTATE
         // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE
         if (Math.abs(turn) >= Constants.INPUT_THRESHOLD) {
             /*
@@ -72,6 +81,7 @@ public class MecanumDrive extends Drivetrain {
             gyroLocked = false;
             return;
         }
+
         // If we're not turning, lock our gyro to track our intended heading
         if (! gyroLocked ) {
             gyroLocked = true;
@@ -95,6 +105,13 @@ public class MecanumDrive extends Drivetrain {
         );
     }
 
+    /**
+     * Execute motion on the drivetrain
+     * @param leftFront
+     * @param leftRear
+     * @param rightFront
+     * @param rightRear
+     */
     public void drive(double leftFront, double leftRear, double rightFront, double rightRear) {
         if(telemetry != null) {
             telemetry.addData("leftFront", leftFront);

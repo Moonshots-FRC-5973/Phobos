@@ -183,6 +183,8 @@ public class Phobos extends OpMode
             clawyMcClawClawferson.setLow();
         } else if(gamepad2.dpad_right){
             clawyMcClawClawferson.setMin();
+        } else if(gamepad2.left_bumper) {
+            clawyMcClawClawferson.setGroundPickup();
         }
 
         if(gamepad2.b && !gp2bPressed && !gamepad2.start) {
@@ -199,6 +201,10 @@ public class Phobos extends OpMode
 
         if(gamepad2.x) {
             clawyMcClawClawferson.setEncoderOffset();
+        }
+
+        if(Math.abs(gamepad2.left_stick_y) >= Constants.INPUT_THRESHOLD) {
+            clawyMcClawClawferson.lowerClawBySpeed(gamepad2.left_stick_y / 2);
         }
 
         if(gamepad2.y) {
