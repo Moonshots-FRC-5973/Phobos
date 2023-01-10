@@ -171,7 +171,16 @@ public class Phobos extends OpMode
         }
         else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
-            drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            double forward = gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
+            double rotate = gamepad1.right_stick_x;
+
+            // DEADZONES
+            if (Math.abs(forward) <= Constants.INPUT_THRESHOLD) forward = 0.0d;
+            if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
+            if (Math.abs(rotate) <= Constants.INPUT_THRESHOLD) rotate = 0.0d;
+
+            drive.drive(forward, strafe, rotate);
         }
         if(gamepad1.a) {
             drive.toggleFieldCentric();

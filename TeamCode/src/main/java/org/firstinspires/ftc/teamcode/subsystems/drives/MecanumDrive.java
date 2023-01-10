@@ -9,27 +9,30 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class MecanumDrive extends Drivetrain {
+    // HARDWARE
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-    private boolean gyroLocked = false;
+
+    // GYRO TRACKERS
     private double gyroTarget;
-    private boolean turningToAngle = false;
     private double targetHeading;
 
-    private boolean useGyro;
-    private boolean inputThreshold;
+    // BOOLEAN TOGGLES
+    private boolean gyroLocked = false;
+    private boolean turningToAngle = false;
+    private boolean useGyro = true;
 
     public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
-        this(hardwareMap, runtime, telemetry, false, false);
+        this(hardwareMap, runtime, telemetry, true);
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry, boolean gyroLocked, boolean useThreshold) {
+    public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry, boolean gyroLocked) {
         super(hardwareMap, runtime, telemetry);
 
         this.useGyro = gyroLocked;
-        this.inputThreshold = useThreshold;
+        // CONFIGURE HARDWARE
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_motor_drive");
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_motor_drive");
@@ -48,71 +51,57 @@ public class MecanumDrive extends Drivetrain {
      */
     public void drive(double forward, double strafe, double turn) {
 
-        // LET'S DISCUSS THIS: Driver should be able to override turnToAngle
-        // If we're turning to an angle, continue turning to the angle and ignore drive inputs.
-        if(turningToAngle) {
-            turnRobotToAngle(targetHeading);
-            return;
-        }
-
         if(telemetry != null) {
-            telemetry.addData("IMU", "Acceleration(%f, %f, %f)", imu.getXVelocity(), imu.getYVelocity(), imu.getZVelocity());
-        }
-
-        // ---------
-        // DEADZONES
-        if(inputThreshold) {
-            if (Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
-                forward = 0.0d;
-            }
-            if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
-                strafe = 0.0d;
-            }
+            telemetry.addData("IMU", "Accel(%.3f, %.3f, %.3f)", imu.getXVelocity(), imu.getYVelocity(), imu.getZVelocity());
         }
 
         if (isFieldCentric) {
-            // We want to adjust by IMU
-            double target = Math.atan2(forward, strafe);
+            // Learn more: https://www.geogebra.org/m/fmegkksm
             double temp = forward;
-
             forward = forward * Math.cos(Math.toRadians(imu.getZAngle())) + strafe * Math.sin(Math.toRadians(imu.getZAngle()));
             strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
         }
 
         // ROTATE
-        // RIGHT STICK OVERRIDES ANY FORWARD/STRAFE
-        if (Math.abs(turn) >= Constants.INPUT_THRESHOLD) {
-            /*
-            double xBoost = 0.0d; // Determine which Axes go to which direction. Only two are needed.
-            double yBoost = 0.0d;
-            double zBoost = 0.0d;
-             */
-
+        // RIGHT STICK DISABLES FORWARD/STRAFE
+        if (Math.abs(turn) >= 0) {
             drive(turn, turn, -turn, turn);
             gyroLocked = false;
             return;
         }
 
         // If we're not turning, lock our gyro to track our intended heading
-        if (! gyroLocked ) {
+        if (!gyroLocked) {
             gyroLocked = true;
             gyroTarget = imu.getZAngle();
         }
 
-        // TUNING VARIABLES
+        // -------------------
+        // GYRO LOCK!
         double gyroError = gyroTarget - imu.getZAngle();
         // if gyroError is positive, robot is rotating to the left, so left side should get more power
-        double frontLeftBoost = Math.toRadians(gyroError);
-        double frontRightBoost = -Math.toRadians(gyroError);
 
-        double backLeftBoost = Math.toRadians(gyroError);
-        double backRightBoost = -Math.toRadians(gyroError);
+        double frontLeftBoost, frontRightBoost, backLeftBoost, backRightBoost;
+        if(useGyro) {
+            frontLeftBoost = Math.toRadians(gyroError);
+            frontRightBoost = -Math.toRadians(gyroError);
+
+            backLeftBoost = Math.toRadians(gyroError);
+            backRightBoost = -Math.toRadians(gyroError);
+        } else {
+            frontLeftBoost = 0.0d;
+            frontRightBoost = 0.0d;
+            backLeftBoost = 0.0d;
+            backRightBoost = 0.0d;
+        }
+        // END GYRO-LOCK
 
         if(telemetry != null) {
             telemetry.addData("Gyro Locked", gyroLocked);
             telemetry.addData("Gyro Target", gyroTarget);
             telemetry.addData("Error", gyroError);
         }
+
         drive(
                 -forward - strafe + frontLeftBoost,
                 -forward + strafe + backLeftBoost,

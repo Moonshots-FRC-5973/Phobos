@@ -16,7 +16,6 @@ public class Autonomous extends LinearOpMode {
     private Claw clawyMcClawClawferson;
     private ColorSensor colorMcColorColorson;
     private int targetMcTargetTargetson = 0;
-
     /**
      * Override this method and place your code here.
      * <p>
@@ -27,7 +26,7 @@ public class Autonomous extends LinearOpMode {
      */
     @Override
     public void runOpMode() throws InterruptedException {
-        driveyMcDriveDriverson = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, telemetry);
+        driveyMcDriveDriverson = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, telemetry, false);
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
         colorMcColorColorson = new ColorSensor(hardwareMap, 1);
         waitForStart();
@@ -38,13 +37,17 @@ public class Autonomous extends LinearOpMode {
             telemetry.addData("Green", colorMcColorColorson.getGreen());
             telemetry.addData("Blue", colorMcColorColorson.getBlue());
             telemetry.update();
+
             switch(targetMcTargetTargetson) {
                 case 1:
                     driveyMcDriveDriverson.drive(0.0d, -0.1d, 0.0d);
+                    break;
                 case 2:
                     driveyMcDriveDriverson.stop();
+                    break;
                 case 3:
                     driveyMcDriveDriverson.drive(0.0d, 0.1d, 0.0d);
+                    break;
                 default:
                     if(colorMcColorColorson.getIntensity() >= 60) {
                         driveyMcDriveDriverson.stop();
@@ -56,7 +59,7 @@ public class Autonomous extends LinearOpMode {
                             targetMcTargetTargetson = 3;
                         }
                     } else {
-                        driveyMcDriveDriverson.drive(-0.15d, 0.0d, 0.0d);
+                        driveyMcDriveDriverson.drive(-0.1d, 0.0d, 0.0d);
                         telemetry.addData("Drive", "Forward");
                     }
             }
