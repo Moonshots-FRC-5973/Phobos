@@ -44,35 +44,40 @@
 //
 
 
-package org.firstinspires.ftc.teamcode.subsystems.sensors;
+package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.motors.RevRobotics20HdHexMotor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp
-@Disabled
-public class ColorSensorTest extends LinearOpMode {
+@TeleOp(name = "Test Color")
+public class TestColor extends LinearOpMode {
     // Define a variable for our color sensor
     ColorSensor color;
-    DcMotor myMotor;
+
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         // Get the color sensor from hardwareMap
-        color = hardwareMap.get(ColorSensor.class, "Color");
-        myMotor = hardwareMap.get(DcMotor.class,"right_drive_one");
+        color = new ColorSensor(hardwareMap, 1);
         // Wait for the Play button to be pressed
         waitForStart();
 
         // While the Op Mode is running, update the telemetry values.
         while (opModeIsActive()) {
-            myMotor.setPower(.75);
-            telemetry.addData("Red", color.red());
-            telemetry.addData("Green", color.green());
-            telemetry.addData("Blue", color.blue());
+            telemetry.addData("Intensity", color.getIntensity());
+            telemetry.addData("Red", color.getRed());
+            telemetry.addData("Green", color.getGreen());
+            telemetry.addData("Blue", color.getBlue());
+            telemetry.addData("Is Red", color.isRed());
+            telemetry.addData("Is Green", color.isGreen());
+            telemetry.addData("Is Blue", color.isBlue());
+            telemetry.addData("Distance", color.getDistance());
             telemetry.update();
         }
     }

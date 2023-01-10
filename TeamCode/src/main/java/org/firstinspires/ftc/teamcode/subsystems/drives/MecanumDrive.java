@@ -18,9 +18,18 @@ public class MecanumDrive extends Drivetrain {
     private boolean turningToAngle = false;
     private double targetHeading;
 
+    private boolean useGyro;
+    private boolean inputThreshold;
+
     public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry) {
+        this(hardwareMap, runtime, telemetry, false, false);
+    }
+
+    public MecanumDrive(HardwareMap hardwareMap, ElapsedTime runtime, Telemetry telemetry, boolean gyroLocked, boolean useThreshold) {
         super(hardwareMap, runtime, telemetry);
 
+        this.useGyro = gyroLocked;
+        this.inputThreshold = useThreshold;
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_motor_drive");
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_motor_drive");
@@ -52,14 +61,16 @@ public class MecanumDrive extends Drivetrain {
 
         // ---------
         // DEADZONES
-        if(Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
-            forward = 0.0d;
-        }
-        if(Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
-            strafe = 0.0d;
+        if(inputThreshold) {
+            if (Math.abs(forward) <= Constants.INPUT_THRESHOLD) {
+                forward = 0.0d;
+            }
+            if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD) {
+                strafe = 0.0d;
+            }
         }
 
-        if (isFieldCentric){
+        if (isFieldCentric) {
             // We want to adjust by IMU
             double target = Math.atan2(forward, strafe);
             double temp = forward;
@@ -91,17 +102,22 @@ public class MecanumDrive extends Drivetrain {
         // TUNING VARIABLES
         double gyroError = gyroTarget - imu.getZAngle();
         // if gyroError is positive, robot is rotating to the left, so left side should get more power
-        double boost = (gyroError / Constants.DRIVE_ANGLE_TOLERANCE) / 180;
+        double frontLeftBoost = Math.toRadians(gyroError);
+        double frontRightBoost = -Math.toRadians(gyroError);
+
+        double backLeftBoost = Math.toRadians(gyroError);
+        double backRightBoost = -Math.toRadians(gyroError);
+
         if(telemetry != null) {
             telemetry.addData("Gyro Locked", gyroLocked);
             telemetry.addData("Gyro Target", gyroTarget);
             telemetry.addData("Error", gyroError);
         }
         drive(
-                -forward - strafe - boost,
-                -forward + strafe - boost,
-                -forward + strafe + boost,
-                forward + strafe - boost
+                -forward - strafe + frontLeftBoost,
+                -forward + strafe + backLeftBoost,
+                -forward + strafe + frontRightBoost,
+                forward + strafe + backRightBoost
         );
     }
 

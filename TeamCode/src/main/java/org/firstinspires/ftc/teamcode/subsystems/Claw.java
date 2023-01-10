@@ -4,9 +4,12 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
@@ -57,27 +60,28 @@ public class Claw {
             rightArmMotor.setMode(RUN_WITHOUT_ENCODER);
         }
         //Adjust power based on arm target position
+        /*
         switch (position) {
             case MIN:
                 leftArmMotor.setPower(0.0d);
                 rightArmMotor.setPower(0.0d);
                 break;
-            case LOW:
-                leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.1);
-                rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.1);
-                break;
             case MID:
-                leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.25);
-                rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.25);
+                leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.15);
+                rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.15);
                 break;
             case HIGH:
-                leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.4);
-                rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.4);
+                leftArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.25);
+                rightArmMotor.setPower(Constants.ARM_MOTOR_POWER - 0.25);
                 break;
             default:
                 leftArmMotor.setPower(Constants.ARM_MOTOR_POWER);
                 rightArmMotor.setPower(Constants.ARM_MOTOR_POWER);
         }
+
+         */
+        leftArmMotor.setPower(Constants.ARM_MOTOR_POWER);
+        rightArmMotor.setPower(Constants.ARM_MOTOR_POWER);
         if(position != Position.MIN) {
             leftArmMotor.setTargetPosition(targetPosition + leftEncoderOffset);
             leftArmMotor.setMode(RUN_TO_POSITION);
@@ -89,7 +93,7 @@ public class Claw {
         telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
         telemetry.addData("Servo Target", armServoPosition);
 
-        if(leftClawHeightServo.getPosition() >= armServoPosition)
+        if(leftClawHeightServo.getPosition() >= armServoPosition || position == Position.CUSTOM)
             leftClawHeightServo.setPosition(armServoPosition);
         clawOpenServo.setPosition(clawServoPosition);
 
@@ -138,7 +142,7 @@ public class Claw {
      * @param hardwareMap the hardware map of the robot
      * @param telemetry the output stream (as an instance of Telemetry) to use for debugging
      */
-    public Claw(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Claw(@NonNull HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         clawOpenServo = hardwareMap.servo.get("claw_open_servo");
         leftArmMotor = hardwareMap.get(DcMotor.class, "left_motor_arm");
@@ -229,13 +233,14 @@ public class Claw {
      * @param speed Adjusts the claw based on speed instead of by encoder
      */
     public void lowerClawBySpeed(double speed) {
-        targetPosition += speed * 10;
+        targetPosition -= speed * 20;
         position = Position.CUSTOM;
         run();
     }
 
-    public void adjustClawAngle(double change){
-        armServoPosition += change;
+    public void adjustClawAngle(double change) {
+        //armServoPosition = Range.clip((change / 40) + armServoPosition, -1, 1);
+        armServoPosition += (change / 137);
         position = Position.CUSTOM;
         run();
     }

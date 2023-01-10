@@ -51,7 +51,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
 @Disabled
-public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
+public class TestTensor extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.

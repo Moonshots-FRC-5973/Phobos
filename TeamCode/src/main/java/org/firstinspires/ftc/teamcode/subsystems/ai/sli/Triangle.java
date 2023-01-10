@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.sli;
+package org.firstinspires.ftc.teamcode.subsystems.ai.sli;
 
 public class Triangle {
     private Vec2 point1, point2, point3;

@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -71,7 +73,7 @@ public class Phobos extends OpMode
     @Override
     public void init() {
         // Add the telemetry output to the dashboard
-        //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // INIT SUBSYSTEMS
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
@@ -90,6 +92,8 @@ public class Phobos extends OpMode
     public void init_loop() {
         telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
         telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
+        telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
+        telemetry.addData("G2RS", "(%f, %f)", gamepad2.right_stick_x, gamepad2.right_stick_y);
         telemetry.update();
     }
 
@@ -107,6 +111,8 @@ public class Phobos extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Runtime", runtime.seconds());
+        telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
+        telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
 
         // DRIVE CONTROLS
         // Comment out the below line to not have the robot drive around.
@@ -125,11 +131,14 @@ public class Phobos extends OpMode
      * gamepad1: responsible for the drive System, movement, control speed, etc.
      */
     private void driver1Inputs() {
+        /*
         if (gamepad1.left_stick_button) {
             telemetry.addData("Drive", "Resetting wheels");
             drive.resetWheels();
             return;
         }
+
+         */
 
         // DPad inputs, checking for overload; control for the drivetrain to rotate the robot
         boolean turnUp = (gamepad1.dpad_up && !gamepad1.dpad_down);

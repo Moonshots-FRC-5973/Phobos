@@ -20,7 +20,7 @@ import java.util.List;
 
 //Test Suite Code.
 @TeleOp(name="Test Suite", group="TeleOp")
-public class TestSuite extends OpMode {
+public class TestStuff extends OpMode {
 
     private DigitalChannel limSwitch;
 

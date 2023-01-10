@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
 
-@Autonomous(name = "Dummy Auto Right")
-public class DummyAutoRight extends LinearOpMode {
+@Autonomous(name = "Dummy Auto Left")
+public class DummyAutoLeft extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Drivetrain drive;
     private Claw clawyMcClawClawferson;
@@ -33,8 +33,8 @@ public class DummyAutoRight extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        while(opModeIsActive() && runtime.seconds() <= 2) {
-            drive.drive(0.0d, 0.5d, 0.0d);
+        while(opModeIsActive() && runtime.seconds() <= 1.5) {
+            drive.drive(0.0d, -0.5d, 0.0d);
         }
     }
 }

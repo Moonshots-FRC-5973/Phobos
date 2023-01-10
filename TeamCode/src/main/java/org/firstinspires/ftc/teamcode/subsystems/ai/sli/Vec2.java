@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.sli;
+package org.firstinspires.ftc.teamcode.subsystems.ai.sli;
 
 public class Vec2 {
     private double x;

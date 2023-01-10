@@ -1,30 +1,36 @@
 package org.firstinspires.ftc.teamcode.subsystems.sensors;
 
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class ColorSensor {
-    private NormalizedColorSensor colorSensor;
+    private com.qualcomm.robotcore.hardware.ColorSensor colorSensor;
     private double multiplier;
 
     public ColorSensor(HardwareMap hardwareMap, double multiplier) {
         this.multiplier = multiplier;
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+        colorSensor = hardwareMap.get(com.qualcomm.robotcore.hardware.ColorSensor.class, "sensor_color");
 
         if (colorSensor instanceof SwitchableLight) {
             ((SwitchableLight)colorSensor).enableLight(true);
         }
     }
 
-    public double getRed() {
-        return colorSensor.getNormalizedColors().red;
+    public double getIntensity() {
+        return (getRed() + getGreen() + getBlue()) / 3;
     }
-    public double getGreen() {
-        return colorSensor.getNormalizedColors().green;
+    public int getRed() {
+        return colorSensor.red();
     }
-    public double getBlue() {
-        return colorSensor.getNormalizedColors().blue;
+    public int getGreen() {
+        return colorSensor.green();
+    }
+    public int getBlue() {
+        return colorSensor.blue();
     }
     public boolean isRed() {
         return (getRed() > getGreen() && getRed() > getBlue());
@@ -34,5 +40,11 @@ public class ColorSensor {
     }
     public boolean isBlue() {
         return (getBlue() > getRed() && getBlue() > getGreen());
+    }
+    public double getDistance() {
+        if (colorSensor instanceof DistanceSensor) {
+            return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+        }
+        return -1;
     }
 }
