@@ -131,14 +131,6 @@ public class Phobos extends OpMode
      * gamepad1: responsible for the drive System, movement, control speed, etc.
      */
     private void driver1Inputs() {
-        /*
-        if (gamepad1.left_stick_button) {
-            telemetry.addData("Drive", "Resetting wheels");
-            drive.resetWheels();
-            return;
-        }
-
-         */
 
         // DPad inputs, checking for overload; control for the drivetrain to rotate the robot
         boolean turnUp = (gamepad1.dpad_up && !gamepad1.dpad_down);
@@ -171,7 +163,7 @@ public class Phobos extends OpMode
         }
         else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
-            double forward = gamepad1.left_stick_y;
+            double forward = -gamepad1.left_stick_y; // flight stick inversion
             double strafe = gamepad1.left_stick_x;
             double rotate = gamepad1.right_stick_x;
 

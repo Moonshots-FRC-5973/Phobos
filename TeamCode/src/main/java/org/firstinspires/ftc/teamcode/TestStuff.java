@@ -10,11 +10,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
 
 import java.util.List;
 
@@ -22,21 +25,25 @@ import java.util.List;
 @TeleOp(name="Test Suite", group="TeleOp")
 public class TestStuff extends OpMode {
 
-    private DigitalChannel limSwitch;
+    // Declare OpMode members.
+    private final ElapsedTime runtime = new ElapsedTime();
+    private MecanumDrive drive;
 
     @Override
     public void init() {
-        limSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
-        limSwitch.setMode(DigitalChannel.Mode.INPUT);
+        // Add the telemetry output to the dashboard
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
     }
 
     @Override
     public void init_loop() {
-        telemetry.addData("lim", limSwitch.getState());
+        drive.setGyroLock();
     }
 
     public void start() {
-
+        runtime.reset();
     }
 
     /**
@@ -46,10 +53,11 @@ public class TestStuff extends OpMode {
      */
     @Override
     public void loop() {
-
+        drive.turnToGyroLock();
     }
 
     @Override
     public void stop() {
+        drive.stop();
     }
 }

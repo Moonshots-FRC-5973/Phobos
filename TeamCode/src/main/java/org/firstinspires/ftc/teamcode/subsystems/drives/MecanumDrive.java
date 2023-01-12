@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.drives;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -41,6 +42,7 @@ public class MecanumDrive extends Drivetrain {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive = hardwareMap.get(DcMotor.class,"right_back_motor_drive");
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     /**
@@ -50,7 +52,6 @@ public class MecanumDrive extends Drivetrain {
      * @param turn a double representing the speed to change the heading
      */
     public void drive(double forward, double strafe, double turn) {
-
         if(telemetry != null) {
             telemetry.addData("IMU", "Accel(%.3f, %.3f, %.3f)", imu.getXVelocity(), imu.getYVelocity(), imu.getZVelocity());
         }
@@ -64,37 +65,50 @@ public class MecanumDrive extends Drivetrain {
 
         // ROTATE
         // RIGHT STICK DISABLES FORWARD/STRAFE
-        if (Math.abs(turn) >= 0) {
-            drive(turn, turn, -turn, turn);
+        if (Math.abs(turn) >= Constants.INPUT_THRESHOLD) {
+            drive(turn, turn, -turn, -turn);
             gyroLocked = false;
             return;
         }
 
+        // -------------------
+        // GYRO LOCK!
         // If we're not turning, lock our gyro to track our intended heading
-        if (!gyroLocked) {
+        if (!gyroLocked &&
+                (Math.abs(forward) >= Constants.INPUT_THRESHOLD || Math.abs(strafe) >= Constants.INPUT_THRESHOLD)) {
             gyroLocked = true;
             gyroTarget = imu.getZAngle();
         }
-
-        // -------------------
-        // GYRO LOCK!
+        // avoid freak-out: kill gyroLock if movement is over
+        else if (gyroLocked &&
+                ((Math.abs(forward) < Constants.INPUT_THRESHOLD || Math.abs(strafe) < Constants.INPUT_THRESHOLD))){
+            gyroLocked = false;
+        }
         double gyroError = gyroTarget - imu.getZAngle();
-        // if gyroError is positive, robot is rotating to the left, so left side should get more power
 
-        double frontLeftBoost, frontRightBoost, backLeftBoost, backRightBoost;
-        if(useGyro) {
-            frontLeftBoost = Math.toRadians(gyroError);
-            frontRightBoost = -Math.toRadians(gyroError);
+        double frontLeftBoost = 0.0d;
+        double frontRightBoost = 0.0d;
+        double backLeftBoost = 0.0d;
+        double backRightBoost = 0.0d;
 
-            backLeftBoost = Math.toRadians(gyroError);
-            backRightBoost = -Math.toRadians(gyroError);
-        } else {
-            frontLeftBoost = 0.0d;
-            frontRightBoost = 0.0d;
-            backLeftBoost = 0.0d;
-            backRightBoost = 0.0d;
+        if(gyroLocked) {
+            // if gyroError is pos, we're rotating to the left, so left side should get more power
+            if(gyroError > Constants.DRIVE_ANGLE_TOLERANCE) {
+                frontLeftBoost = ((gyroError % 180) / 180);
+                backLeftBoost = ((gyroError % 180) / 180);
+                frontRightBoost = -((gyroError % 180) / 180);
+                backRightBoost = -((gyroError % 180) / 180);
+            }
+            // if gyroError is neg, we're rotating right, so right side should get more power
+            else if (gyroError < Constants.DRIVE_ANGLE_TOLERANCE){
+                frontLeftBoost = -((gyroError % 180) / 180);
+                backLeftBoost = -((gyroError % 180) / 180);
+                frontRightBoost = ((gyroError % 180) / 180);
+                backRightBoost = ((gyroError % 180) / 180);
+            }
         }
         // END GYRO-LOCK
+        // --------------------
 
         if(telemetry != null) {
             telemetry.addData("Gyro Locked", gyroLocked);
@@ -103,11 +117,12 @@ public class MecanumDrive extends Drivetrain {
         }
 
         drive(
-                -forward - strafe + frontLeftBoost,
-                -forward + strafe + backLeftBoost,
-                -forward + strafe + frontRightBoost,
+                forward + strafe + frontLeftBoost,
+                forward - strafe + backLeftBoost,
+                forward - strafe + frontRightBoost,
                 forward + strafe + backRightBoost
         );
+
     }
 
     /**
@@ -143,10 +158,10 @@ public class MecanumDrive extends Drivetrain {
 
     @Override
     public void turnRobotToAngle(double target) {
-        gyroLocked = false;
-        targetHeading = target;
+        gyroLocked = true;
+        gyroTarget = target;
         // Get the error. Positive means we need to rotate to the left
-        double error = targetHeading - imu.getZAngle();
+        double error = gyroTarget - imu.getZAngle();
         // Ensure we don't move farther than one rotation
         error %= 360;
         telemetry.addData("Rot Error", error);
@@ -160,6 +175,19 @@ public class MecanumDrive extends Drivetrain {
         }
         // As we approach the angle, we need to slow down the rotation
         double power = Range.clip(-error / 360, -0.5, 0.5);
-        drive(power, power, -power, power);
+        drive(power, power, -power, -power);
+    }
+
+    public void disableGyroLock(){
+        gyroLocked = false;
+    }
+
+    public void setGyroLock(){
+        gyroTarget = imu.getZAngle();
+        gyroLocked = true;
+    }
+
+    public void turnToGyroLock() {
+        turnRobotToAngle(gyroTarget);
     }
 }

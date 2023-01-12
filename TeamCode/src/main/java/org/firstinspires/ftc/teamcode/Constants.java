@@ -5,12 +5,12 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 public class Constants {
     // _______________
     // --  GENERAL  --
-    public static final double INPUT_THRESHOLD = 0.1;
+    public static final double INPUT_THRESHOLD = 0.05;
 
     // _______________
     // ---  DRIVE  ---
     // Precision of the subsystem approaching an angle
-    public static final double DRIVE_ANGLE_TOLERANCE = 5;
+    public static final double DRIVE_ANGLE_TOLERANCE = 1.5;
     // motor names
     public static final String DRIVE_MOTOR_ONE_NAME = "left_drive";
     public static final String DRIVE_MOTOR_TWO_NAME = "right_drive";
@@ -20,7 +20,7 @@ public class Constants {
     @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
     // Minimum input for the subsystem to respond
-    public static final double DRIVE_MOTOR_MAX_SPEED = 0.5;
+    public static final double DRIVE_MOTOR_MAX_SPEED = 0.4;
 
     // ________________
     // ----  ARM   ----
