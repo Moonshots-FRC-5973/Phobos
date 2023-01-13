@@ -16,6 +16,7 @@ public class Autonomous extends LinearOpMode {
     private Claw clawyMcClawClawferson;
     private ColorSensor colorMcColorColorson;
     private int targetMcTargetTargetson = 0;
+    private double whenDetermined = 0;
     /**
      * Override this method and place your code here.
      * <p>
@@ -40,26 +41,30 @@ public class Autonomous extends LinearOpMode {
 
             switch(targetMcTargetTargetson) {
                 case 1:
-                    driveyMcDriveDriverson.drive(0.0d, -0.1d, 0.0d);
+                    if (whenDetermined + 2 > timeyMcTimeTimerson.seconds())
+                        driveyMcDriveDriverson.drive(0.1d, 0.0d, 0.0d);
+                    else
+                        driveyMcDriveDriverson.drive(0.0d, 0.1d, 0.0d);
                     break;
                 case 2:
                     driveyMcDriveDriverson.stop();
                     break;
                 case 3:
-                    driveyMcDriveDriverson.drive(0.0d, 0.1d, 0.0d);
+                    driveyMcDriveDriverson.drive(0.0d, -0.1d, 0.0d);
                     break;
                 default:
-                    if(colorMcColorColorson.getIntensity() >= 60) {
+                    if(colorMcColorColorson.getIntensity() >= 200) {
                         driveyMcDriveDriverson.stop();
+                        whenDetermined = timeyMcTimeTimerson.seconds();
                         if(colorMcColorColorson.isRed()) {
-                            targetMcTargetTargetson = 1;
+                            targetMcTargetTargetson = 3;
                         } else if(colorMcColorColorson.isGreen()) {
                             targetMcTargetTargetson = 2;
                         } else if(colorMcColorColorson.isBlue()) {
-                            targetMcTargetTargetson = 3;
+                            targetMcTargetTargetson = 1;
                         }
                     } else {
-                        driveyMcDriveDriverson.drive(-0.1d, 0.0d, 0.0d);
+                        driveyMcDriveDriverson.drive(0.1d, 0.0d, 0.0d);
                         telemetry.addData("Drive", "Forward");
                     }
             }
