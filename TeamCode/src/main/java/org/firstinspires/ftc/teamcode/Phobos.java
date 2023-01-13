@@ -66,6 +66,7 @@ public class Phobos extends OpMode
 
     // Input state holders
     private boolean gp2bPressed = false;
+    private boolean gp1aPressed = false;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -174,9 +175,12 @@ public class Phobos extends OpMode
 
             drive.drive(forward, strafe, rotate);
         }
-        if(gamepad1.a) {
+
+        if(gamepad1.a && !gp1aPressed) {
             drive.toggleFieldCentric();
         }
+
+        gp1aPressed = gamepad1.a;
     }
 
     /**
