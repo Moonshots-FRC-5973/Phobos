@@ -14,10 +14,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.checkerframework.checker.units.qual.C;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.DistanceSensor;
 
 import java.util.List;
 
@@ -25,25 +28,35 @@ import java.util.List;
 @TeleOp(name="Test Suite", group="TeleOp")
 public class TestStuff extends OpMode {
 
-    // Declare OpMode members.
-    private final ElapsedTime runtime = new ElapsedTime();
-    private MecanumDrive drive;
+
+    private ColorSensor colorMcColorColorson;
+    private DistanceSensor distanceBack;
+    private DistanceSensor distanceLeft;
+    private DistanceSensor distanceRight;
 
     @Override
     public void init() {
-        // Add the telemetry output to the dashboard
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
+        colorMcColorColorson = new ColorSensor(hardwareMap, 1);
+        // back
+        distanceBack = new DistanceSensor(hardwareMap, 0);
+        // left
+        distanceLeft = new DistanceSensor(hardwareMap, 1);
+        // right
+        distanceRight = new DistanceSensor(hardwareMap, 2);
     }
 
     @Override
     public void init_loop() {
-        drive.setGyroLock();
+        telemetry.addData("Color", "Color(" + colorMcColorColorson.getRed() + ", " + colorMcColorColorson.getGreen() + ", ", colorMcColorColorson.getBlue() + ")");
+        telemetry.addData("Color", "Distance " + colorMcColorColorson.getDistance());
+        telemetry.addData("Back", distanceBack.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Left", distanceLeft.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Right", distanceRight.getDistance(DistanceUnit.INCH));
+        telemetry.update();
     }
 
     public void start() {
-        runtime.reset();
+
     }
 
     /**
@@ -53,11 +66,10 @@ public class TestStuff extends OpMode {
      */
     @Override
     public void loop() {
-        drive.turnToGyroLock();
     }
 
     @Override
     public void stop() {
-        drive.stop();
+
     }
 }
