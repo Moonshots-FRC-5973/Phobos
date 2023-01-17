@@ -59,8 +59,8 @@ public class MecanumDrive extends Drivetrain {
         if (isFieldCentric) {
             // Learn more: https://www.geogebra.org/m/fmegkksm
             double temp = forward;
-            forward = forward * Math.cos(Math.toRadians(imu.getZAngle())) + strafe * Math.sin(Math.toRadians(imu.getZAngle()));
-            strafe = -temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
+            forward = forward * Math.cos(Math.toRadians(imu.getZAngle())) - strafe * Math.sin(Math.toRadians(imu.getZAngle()));
+            strafe = temp * Math.sin(Math.toRadians(imu.getZAngle())) + strafe * Math.cos(Math.toRadians(imu.getZAngle()));
         }
 
         // ROTATE
