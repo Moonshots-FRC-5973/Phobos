@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
@@ -13,8 +14,10 @@ import org.firstinspires.ftc.teamcode.subsystems.sensors.*;
 public class Autonomous extends LinearOpMode {
 
     private static double TILE_DIST = 22;
+    private static double FAR_DIST = 51;
+    private static double NEAR_DIST = 4;
 
-    private Drivetrain drivetrain;
+    private MecanumDrive drivetrain;
     private ElapsedTime timeyMcTimeTimerson = new ElapsedTime();
     private Claw clawyMcClawClawferson;
     private ColorSensor colorMcColorColorson;
@@ -34,7 +37,7 @@ public class Autonomous extends LinearOpMode {
      */
     @Override
     public void runOpMode() throws InterruptedException {
-        drivetrain = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, null);
+        drivetrain = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, telemetry);
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
         colorMcColorColorson = new ColorSensor(hardwareMap, 1);
         // back
@@ -44,7 +47,22 @@ public class Autonomous extends LinearOpMode {
         // right
         distanceRight = new DistanceSensor(hardwareMap, 2);
 
-        if(distanceRight.getDistance() > distanceLeft.getDistance()) {
+        // we were misreading the field so double polling :)
+        double right1, right2, left1, left2;
+        do {
+
+            right1 = distanceRight.getDistance();
+            left1 = distanceLeft.getDistance();
+
+            sleep(1);
+
+            right2 = distanceRight.getDistance();
+            left2 = distanceLeft.getDistance();
+        }
+        // checking for dif bewteen 1st + 2nd reading
+        while (Math.abs(right1 - right2) > 5 && Math.abs(left1 - left2) > 5);
+
+        if(right1 > left1) {
             onLeftSide = true;
         } else {
             onLeftSide = false;
@@ -84,10 +102,10 @@ public class Autonomous extends LinearOpMode {
             drivetrain.drive(0.1d, 0.0d, 0.0d);
 
         if(onLeftSide) {
-            while(distanceLeft.getDistance(DistanceUnit.INCH) >= 4)
+            while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
                 drivetrain.drive(0.0d, -0.1d, 0.0d);
         } else {
-            while(distanceRight.getDistance(DistanceUnit.INCH) <= 48)
+            while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST)
                 drivetrain.drive(0.0d, -0.1d, 0.0d);
         }
 
@@ -106,10 +124,13 @@ public class Autonomous extends LinearOpMode {
             drivetrain.drive(0.1d, 0.0d, 0.0d);
 
         if(onLeftSide) {
-            while(distanceLeft.getDistance(DistanceUnit.INCH) <= 48)
+            while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
                 drivetrain.drive(0.0d, 0.1d, 0.0d);
+            while(Math.abs(drivetrain.getIMU().getZAngle() + 45) > Constants.DRIVE_ANGLE_TOLERANCE) {
+                drivetrain.turnRobotToAngle(-45);
+            } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
         } else {
-            while(distanceRight.getDistance(DistanceUnit.INCH) >= 4)
+            while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
                 drivetrain.drive(0.0d, 0.1d, 0.0d);
         }
 
