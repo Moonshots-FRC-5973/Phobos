@@ -40,11 +40,11 @@ public class Claw {
 
     private int leftEncoderOffset;
     private int rightEncoderOffset;
-    private DcMotor leftArmMotor;
-    private DcMotor rightArmMotor;
-    private Servo leftClawHeightServo;
-    private Servo clawOpenServo;
-    private Telemetry telemetry;
+    private final DcMotor leftArmMotor;
+    private final DcMotor rightArmMotor;
+    private final Servo leftClawHeightServo;
+    private final Servo clawOpenServo;
+    private final Telemetry telemetry;
     private double armServoPosition = 0;
     private double clawServoPosition = 0;
     private int targetPosition = 0;
@@ -55,10 +55,6 @@ public class Claw {
      * Activates the movement of the arm
      */
     private void run() {
-        if(position == Position.MIN) {
-            leftArmMotor.setMode(RUN_WITHOUT_ENCODER);
-            rightArmMotor.setMode(RUN_WITHOUT_ENCODER);
-        }
         //Adjust power based on arm target position
         /*
         switch (position) {
@@ -82,12 +78,10 @@ public class Claw {
          */
         leftArmMotor.setPower(Constants.ARM_MOTOR_POWER);
         rightArmMotor.setPower(Constants.ARM_MOTOR_POWER);
-        if(position != Position.MIN) {
-            leftArmMotor.setTargetPosition(targetPosition + leftEncoderOffset);
-            leftArmMotor.setMode(RUN_TO_POSITION);
-            rightArmMotor.setTargetPosition(targetPosition + rightEncoderOffset);
-            rightArmMotor.setMode(RUN_TO_POSITION);
-        }
+        leftArmMotor.setTargetPosition(targetPosition + leftEncoderOffset);
+        leftArmMotor.setMode(RUN_TO_POSITION);
+        rightArmMotor.setTargetPosition(targetPosition + rightEncoderOffset);
+        rightArmMotor.setMode(RUN_TO_POSITION);
 
         telemetry.addData("LAM", leftArmMotor.getCurrentPosition());
         telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
@@ -121,6 +115,10 @@ public class Claw {
      */
     public int getRightCurrentHeight() {
         return rightArmMotor.getCurrentPosition();
+    }
+
+    public int getLeftEncoderOffset() {
+        return leftEncoderOffset;
     }
 
     /**

@@ -14,10 +14,12 @@ import org.firstinspires.ftc.teamcode.subsystems.sensors.*;
 public class Autonomous extends LinearOpMode {
 
     private static double TILE_DIST = 22;
-    private static double FAR_DIST = 51;
+    private static double FAR_DIST = 48;
     private static double NEAR_DIST = 4;
+    private static double MOTOR_SPEED = 0.1;
+    private static double ROT_ANGLE_3 = 35;
 
-    private MecanumDrive drivetrain;
+    private Drivetrain drivetrain;
     private ElapsedTime timeyMcTimeTimerson = new ElapsedTime();
     private Claw clawyMcClawClawferson;
     private ColorSensor colorMcColorColorson;
@@ -38,6 +40,7 @@ public class Autonomous extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drivetrain = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, telemetry);
+        drivetrain.toggleFieldCentric();
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
         colorMcColorColorson = new ColorSensor(hardwareMap, 1);
         // back
@@ -54,12 +57,12 @@ public class Autonomous extends LinearOpMode {
             right1 = distanceRight.getDistance();
             left1 = distanceLeft.getDistance();
 
-            sleep(1);
+            sleep(1000);
 
             right2 = distanceRight.getDistance();
             left2 = distanceLeft.getDistance();
         }
-        // checking for dif bewteen 1st + 2nd reading
+        // checking for dif between 1st + 2nd reading
         while (Math.abs(right1 - right2) > 5 && Math.abs(left1 - left2) > 5);
 
         if(right1 > left1) {
@@ -68,8 +71,27 @@ public class Autonomous extends LinearOpMode {
             onLeftSide = false;
         }
 
+        telemetry.addData("On Left Side", onLeftSide);
+        telemetry.update();
+
         waitForStart();
 
+        findTarget();
+
+        switch(targetMcTargetTargetson) {
+            case 1:
+                case1();
+                break;
+            case 2:
+                case2();
+                break;
+            case 3:
+                case3();
+                break;
+            default:
+                drivetrain.stop();
+        }
+        /**
         while(opModeIsActive()) {
             telemetry.addData("Intensity", colorMcColorColorson.getIntensity());
             telemetry.addData("Red", colorMcColorColorson.getRed());
@@ -81,32 +103,21 @@ public class Autonomous extends LinearOpMode {
             telemetry.addData("On Left Side", onLeftSide);
             telemetry.update();
 
-            switch(targetMcTargetTargetson) {
-                case 1:
-                    case1();
-                    break;
-                case 2:
-                    case2();
-                    break;
-                case 3:
-                    case3();
-                    break;
-                default:
-                    findTarget();
-            }
+
         }
+         */
     }
 
     private void case1() {
         while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST)
-            drivetrain.drive(0.1d, 0.0d, 0.0d);
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
         if(onLeftSide) {
             while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
-                drivetrain.drive(0.0d, -0.1d, 0.0d);
+                drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
         } else {
             while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST)
-                drivetrain.drive(0.0d, -0.1d, 0.0d);
+                drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
         }
 
         drivetrain.stop();
@@ -114,42 +125,69 @@ public class Autonomous extends LinearOpMode {
 
     private void case2() {
         while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST)
-            drivetrain.drive(0.1d, 0.0d, 0.0d);
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
         drivetrain.stop();
     }
 
     private void case3() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST)
-            drivetrain.drive(0.1d, 0.0d, 0.0d);
+        //TODO:  Clean up magic numbers -- first is moving the signal out of the way
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+            drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
+
+        drivetrain.stop();
 
         if(onLeftSide) {
             while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
-                drivetrain.drive(0.0d, 0.1d, 0.0d);
-            while(Math.abs(drivetrain.getIMU().getZAngle() + 45) > Constants.DRIVE_ANGLE_TOLERANCE) {
-                drivetrain.turnRobotToAngle(-45);
+                drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
+            while(Math.abs(drivetrain.getIMU().getZAngle() + ROT_ANGLE_3) > Constants.DRIVE_ANGLE_TOLERANCE) {
+                drivetrain.turnRobotToAngle(-ROT_ANGLE_3);
             } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
         } else {
             while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
-                drivetrain.drive(0.0d, 0.1d, 0.0d);
+                drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
         }
 
+        drivetrain.stop();
+
+        clawyMcClawClawferson.setHigh();
+        sleep(2000);
+        clawyMcClawClawferson.angleClaw();
+        drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+        sleep(3200);
+        drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
+        sleep(1500);
+        drivetrain.stop();
+        clawyMcClawClawferson.open();
+        sleep(250);
+        drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
+        clawyMcClawClawferson.close();
+        sleep(1100);
+        clawyMcClawClawferson.setMin();
+        while(Math.abs(drivetrain.getIMU().getZAngle()) > Constants.DRIVE_ANGLE_TOLERANCE) {
+            drivetrain.turnRobotToAngle(0);
+        } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
+        drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+        sleep(1100);
         drivetrain.stop();
     }
 
     private void findTarget() {
-        if(colorMcColorColorson.getIntensity() >= 200) {
-            drivetrain.stop();
-            whenDetermined = timeyMcTimeTimerson.seconds();
-            if(colorMcColorColorson.isRed()) {
-                targetMcTargetTargetson = 3;
-            } else if(colorMcColorColorson.isGreen()) {
-                targetMcTargetTargetson = 2;
-            } else if(colorMcColorColorson.isBlue()) {
-                targetMcTargetTargetson = 1;
-            }
-        } else {
-            drivetrain.drive(0.1d, 0.0d, 0.0d);
+        while(colorMcColorColorson.getIntensity() <= 200) {
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+        }
+
+        drivetrain.stop();
+        whenDetermined = timeyMcTimeTimerson.seconds();
+        if (colorMcColorColorson.isRed()) {
+            targetMcTargetTargetson = 3;
+        } else if (colorMcColorColorson.isGreen()) {
+            targetMcTargetTargetson = 2;
+        } else if (colorMcColorColorson.isBlue()) {
+            targetMcTargetTargetson = 1;
         }
     }
 }
