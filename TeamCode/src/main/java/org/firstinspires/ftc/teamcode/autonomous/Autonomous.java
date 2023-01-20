@@ -76,6 +76,10 @@ public class Autonomous extends LinearOpMode {
 
         waitForStart();
 
+        if(!opModeIsActive()) {
+            return;
+        }
+
         findTarget();
 
         switch(targetMcTargetTargetson) {
@@ -131,7 +135,6 @@ public class Autonomous extends LinearOpMode {
     }
 
     private void case3() {
-        //TODO:  Clean up magic numbers -- first is moving the signal out of the way
         while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
@@ -154,20 +157,21 @@ public class Autonomous extends LinearOpMode {
         drivetrain.stop();
 
         clawyMcClawClawferson.setHigh();
-        sleep(2000);
+        sleep(3000);
         clawyMcClawClawferson.angleClaw();
         drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(3200);
+        sleep(2200);
+        drivetrain.stop();
         drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(1500);
+        sleep(1900);
         drivetrain.stop();
         clawyMcClawClawferson.open();
         sleep(250);
         drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
         clawyMcClawClawferson.close();
-        sleep(1100);
+        sleep(600);
         clawyMcClawClawferson.setMin();
-        while(Math.abs(drivetrain.getIMU().getZAngle()) > Constants.DRIVE_ANGLE_TOLERANCE) {
+        while(Math.abs(drivetrain.getIMU().getZAngle()) > 1) {
             drivetrain.turnRobotToAngle(0);
         } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
         drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
