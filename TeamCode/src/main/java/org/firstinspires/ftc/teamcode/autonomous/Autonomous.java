@@ -135,15 +135,18 @@ public class Autonomous extends LinearOpMode {
     }
 
     private void case3() {
+        // why are we pushing the cone forward?
         while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
+        // ... only to have to back up ...?
         while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
             drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
 
         drivetrain.stop();
 
         if(onLeftSide) {
+            // get to the square then turn
             while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
                 drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
             while(Math.abs(drivetrain.getIMU().getZAngle() + ROT_ANGLE_3) > Constants.DRIVE_ANGLE_TOLERANCE) {
@@ -156,26 +159,39 @@ public class Autonomous extends LinearOpMode {
 
         drivetrain.stop();
 
+        // raise arm and claw
         clawyMcClawClawferson.setHigh();
         sleep(3000);
         clawyMcClawClawferson.angleClaw();
+
+        // smash into post
         drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
         sleep(2200);
         drivetrain.stop();
+
+        // back up and drop
         drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(1900);
+        sleep(1700); // FIX THIS YOU PICCCCCCCCCCCCC
         drivetrain.stop();
         clawyMcClawClawferson.open();
         sleep(250);
+
+        // square up and center
         drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
         clawyMcClawClawferson.close();
         sleep(600);
-        clawyMcClawClawferson.setMin();
-        while(Math.abs(drivetrain.getIMU().getZAngle()) > 1) {
+        while(Math.abs(drivetrain.getIMU().getZAngle()) > Constants.DRIVE_ANGLE_TOLERANCE) {
             drivetrain.turnRobotToAngle(0);
         } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
-        drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(1100);
+
+        clawyMcClawClawferson.setMin(); // ARM STAYING UP....... WHY?
+
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 3)
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+
+        while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
+            drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
+
         drivetrain.stop();
     }
 
