@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -8,10 +10,11 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.drives.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.sensors.*;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.sensors.DistanceSensor;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous Main")
-public class Autonomous extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous Right")
+public class AutonomousRight extends LinearOpMode {
 
     private static double TILE_DIST = 22;
     private static double FAR_DIST = 48;
@@ -28,7 +31,7 @@ public class Autonomous extends LinearOpMode {
     private DistanceSensor distanceRight;
     private int targetMcTargetTargetson = 0;
     private double whenDetermined = 0;
-    private boolean onLeftSide = false;
+    private boolean onLeftSide;
     /**
      * Override this method and place your code here.
      * <p>
@@ -39,6 +42,7 @@ public class Autonomous extends LinearOpMode {
      */
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drivetrain = new MecanumDrive(hardwareMap, timeyMcTimeTimerson, telemetry);
         drivetrain.toggleFieldCentric();
         clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
@@ -50,29 +54,7 @@ public class Autonomous extends LinearOpMode {
         // right
         distanceRight = new DistanceSensor(hardwareMap, 2);
 
-        // we were misreading the field so double polling :)
-        double right1, right2, left1, left2;
-        do {
-
-            right1 = distanceRight.getDistance();
-            left1 = distanceLeft.getDistance();
-
-            sleep(1000);
-
-            right2 = distanceRight.getDistance();
-            left2 = distanceLeft.getDistance();
-        }
-        // checking for dif between 1st + 2nd reading
-        while (Math.abs(right1 - right2) > 5 && Math.abs(left1 - left2) > 5);
-
-        if(right1 > left1) {
-            onLeftSide = true;
-        } else {
-            onLeftSide = false;
-        }
-
-        telemetry.addData("On Left Side", onLeftSide);
-        telemetry.update();
+        onLeftSide = false;
 
         waitForStart();
 
@@ -110,86 +92,49 @@ public class Autonomous extends LinearOpMode {
 
         }
          */
+        drivetrain.stop();
+
+        clawyMcClawClawferson.setMin();
+        clawyMcClawClawferson.angleClaw();
+
+        sleep(30000);
+
     }
 
     private void case1() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST)
-            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
-
-        if(onLeftSide) {
-            while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
-                drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
-        } else {
-            while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST)
-                drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
-        }
-
-        drivetrain.stop();
-    }
-
-    private void case2() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST)
-            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
-
-        drivetrain.stop();
-    }
-
-    private void case3() {
-        // why are we pushing the cone forward?
         while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
-        // ... only to have to back up ...?
         while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
             drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
 
         drivetrain.stop();
 
-        if(onLeftSide) {
-            // get to the square then turn
-            while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
-                drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
-            while(Math.abs(drivetrain.getIMU().getZAngle() + ROT_ANGLE_3) > Constants.DRIVE_ANGLE_TOLERANCE) {
-                drivetrain.turnRobotToAngle(-ROT_ANGLE_3);
-            } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
-        } else {
-            while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
-                drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
+        while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST) {
+            telemetry.addData("Right", distanceRight.getDistance(DistanceUnit.INCH));
+            telemetry.update();
+            drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
         }
+    }
 
-        drivetrain.stop();
-
-        // raise arm and claw
-        clawyMcClawClawferson.setHigh();
-        sleep(3000);
-        clawyMcClawClawferson.angleClaw();
-
-        // smash into post
-        drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(2200);
-        drivetrain.stop();
-
-        // back up and drop
-        drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
-        sleep(1700); // FIX THIS YOU PICCCCCCCCCCCCC
-        drivetrain.stop();
-        clawyMcClawClawferson.open();
-        sleep(250);
-
-        // square up and center
-        drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
-        clawyMcClawClawferson.close();
-        sleep(600);
-        while(Math.abs(drivetrain.getIMU().getZAngle()) > Constants.DRIVE_ANGLE_TOLERANCE) {
-            drivetrain.turnRobotToAngle(0);
-        } // Stop it from freaking out now that its turned and the distance sensor have triggering data - you know who wrote this
-
-        clawyMcClawClawferson.setMin(); // ARM STAYING UP....... WHY?
-
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 3)
+    private void case2() {
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 7)
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
-        while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+            drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
+    }
+
+    private void case3() {
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
+            drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
+
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+            drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
+
+        drivetrain.stop();
+
+        while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
             drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
 
         drivetrain.stop();
@@ -204,10 +149,14 @@ public class Autonomous extends LinearOpMode {
         whenDetermined = timeyMcTimeTimerson.seconds();
         if (colorMcColorColorson.isRed()) {
             targetMcTargetTargetson = 3;
+            telemetry.addData("Side", "Red: 3");
         } else if (colorMcColorColorson.isGreen()) {
             targetMcTargetTargetson = 2;
+            telemetry.addData("Side", "Green: 2");
         } else if (colorMcColorColorson.isBlue()) {
             targetMcTargetTargetson = 1;
+            telemetry.addData("Side", "Blue: 1");
         }
+        telemetry.update();
     }
 }

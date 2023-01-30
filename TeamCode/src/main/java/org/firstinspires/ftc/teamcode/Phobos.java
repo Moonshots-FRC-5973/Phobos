@@ -132,7 +132,6 @@ public class Phobos extends OpMode
      * gamepad1: responsible for the drive System, movement, control speed, etc.
      */
     private void driver1Inputs() {
-
         // DPad inputs, checking for overload; control for the drivetrain to rotate the robot
         boolean turnUp = (gamepad1.dpad_up && !gamepad1.dpad_down);
         boolean turnDown = (gamepad1.dpad_down && !gamepad1.dpad_up);
@@ -176,7 +175,7 @@ public class Phobos extends OpMode
             drive.drive(forward, strafe, rotate);
         }
 
-        if(gamepad1.a && !gp1aPressed) {
+        if(gamepad1.a && !gp1aPressed && !gamepad1.start) {
             drive.toggleFieldCentric();
         }
 
@@ -195,8 +194,6 @@ public class Phobos extends OpMode
             clawyMcClawClawferson.setLow();
         } else if(gamepad2.dpad_right){
             clawyMcClawClawferson.setMin();
-        } else if(gamepad2.left_bumper) {
-            clawyMcClawClawferson.setGroundPickup();
         }
 
         if(gamepad2.b && !gp2bPressed && !gamepad2.start) {
@@ -216,7 +213,7 @@ public class Phobos extends OpMode
         }
 
         if(Math.abs(gamepad2.left_stick_y) >= Constants.INPUT_THRESHOLD) {
-            clawyMcClawClawferson.lowerClawBySpeed(gamepad2.left_stick_y / 2);
+            clawyMcClawClawferson.lowerClawBySpeed(gamepad2.left_stick_y);
         }
 
         if(Math.abs(gamepad2.right_stick_y) >= Constants.INPUT_THRESHOLD){
@@ -225,6 +222,18 @@ public class Phobos extends OpMode
 
         if(gamepad2.y) {
             clawyMcClawClawferson.stop();
+        }
+
+        if(gamepad2.left_bumper) {
+            clawyMcClawClawferson.moveLeftArmMotor(1);
+        } else if(Math.abs(gamepad2.left_trigger) >= Constants.INPUT_THRESHOLD) {
+            clawyMcClawClawferson.moveLeftArmMotor(-gamepad2.left_trigger);
+        }
+
+        if(gamepad2.right_bumper) {
+            clawyMcClawClawferson.moveRightArmMotor(1);
+        } else if(Math.abs(gamepad2.right_trigger) >= Constants.INPUT_THRESHOLD) {
+            clawyMcClawClawferson.moveRightArmMotor(-gamepad1.right_trigger);
         }
 
         gp2bPressed = gamepad2.b;

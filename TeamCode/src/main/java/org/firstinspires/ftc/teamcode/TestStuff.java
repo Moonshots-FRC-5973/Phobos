@@ -47,12 +47,7 @@ public class TestStuff extends OpMode {
 
     @Override
     public void init_loop() {
-        telemetry.addData("Color", "Color(" + colorMcColorColorson.getRed() + ", " + colorMcColorColorson.getGreen() + ", ", colorMcColorColorson.getBlue() + ")");
-        telemetry.addData("Color", "Distance " + colorMcColorColorson.getDistance());
-        telemetry.addData("Back", distanceBack.getDistance(DistanceUnit.INCH));
-        telemetry.addData("Left", distanceLeft.getDistance(DistanceUnit.INCH));
-        telemetry.addData("Right", distanceRight.getDistance(DistanceUnit.INCH));
-        telemetry.update();
+
     }
 
     public void start() {
@@ -66,6 +61,12 @@ public class TestStuff extends OpMode {
      */
     @Override
     public void loop() {
+        telemetry.addData("Color", "Color(" + colorMcColorColorson.getRed() + ", " + colorMcColorColorson.getGreen() + ", " + colorMcColorColorson.getBlue() + ")");
+        telemetry.addData("Color", "Distance " + colorMcColorColorson.getDistance());
+        telemetry.addData("Back", distanceBack.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Left", distanceLeft.getDistance(DistanceUnit.INCH));
+        telemetry.addData("Right", distanceRight.getDistance(DistanceUnit.INCH));
+        telemetry.update();
     }
 
     @Override

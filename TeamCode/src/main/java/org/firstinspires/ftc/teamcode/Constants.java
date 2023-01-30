@@ -5,7 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 public class Constants {
     // _______________
     // --  GENERAL  --
-    public static final double INPUT_THRESHOLD = 0.05;
+    public static final double INPUT_THRESHOLD = 0.1;
 
     // _______________
     // ---  DRIVE  ---
@@ -20,7 +20,7 @@ public class Constants {
     @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
     // Minimum input for the subsystem to respond
-    public static final double DRIVE_MOTOR_MAX_SPEED = 0.4;
+    public static final double DRIVE_MOTOR_MAX_SPEED = 0.3;
 
     // ________________
     // ----  ARM   ----

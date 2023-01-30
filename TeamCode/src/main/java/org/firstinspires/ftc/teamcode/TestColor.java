@@ -7,7 +7,7 @@
 //import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 //import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 //
-//@TeleOp(name="Color Sensor Test", group="Autonomous")
+//@TeleOp(name="Color Sensor Test", group="AutonomousLeft")
 //public class ColorSensorTest extends OpMode {
 //    NormalizedColorSensor colorSensor;
 //

@@ -152,6 +152,9 @@ public class Claw {
         leftClawHeightServo.setPosition(0);
         clawOpenServo.setPosition(Constants.CLAW_CLOSED_POSITION);
         position = Position.MIN;
+        clawServoPosition = Constants.CLAW_CLOSED_POSITION;
+        armServoPosition = Constants.CLAW_HEIGHT_MIN_POSITION;
+        targetPosition = Constants.ARM_DOWN_POSITION;
         setEncoderOffset();
     }
 
@@ -231,15 +234,24 @@ public class Claw {
      * @param speed Adjusts the claw based on speed instead of by encoder
      */
     public void lowerClawBySpeed(double speed) {
-        targetPosition -= speed * 20;
+        targetPosition -= speed * 5;
         position = Position.CUSTOM;
         run();
     }
 
     public void adjustClawAngle(double change) {
         //armServoPosition = Range.clip((change / 40) + armServoPosition, -1, 1);
-        armServoPosition += (change / 137);
+        armServoPosition += (2 * change) / 137;
         position = Position.CUSTOM;
+        run();
+    }
+
+    public void moveLeftArmMotor(double change) {
+        leftEncoderOffset += change;
+        run();
+    }
+    public void moveRightArmMotor(double change) {
+        rightEncoderOffset += change;
         run();
     }
 
@@ -253,6 +265,4 @@ public class Claw {
         rightArmMotor.setMode(RUN_WITHOUT_ENCODER);
         rightArmMotor.setPower(0.0d);
     }
-
-
 }
