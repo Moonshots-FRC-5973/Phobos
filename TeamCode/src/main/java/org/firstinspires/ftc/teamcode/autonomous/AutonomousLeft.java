@@ -103,8 +103,10 @@ public class AutonomousLeft extends LinearOpMode {
 
         drivetrain.stop();
 
-        while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
+        while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
             drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
+
+        // add a stop here? 
     }
 
     private void case2() {

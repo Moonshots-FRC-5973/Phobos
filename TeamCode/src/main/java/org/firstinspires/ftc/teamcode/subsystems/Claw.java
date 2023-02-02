@@ -83,16 +83,20 @@ public class Claw {
         rightArmMotor.setTargetPosition(targetPosition + rightEncoderOffset);
         rightArmMotor.setMode(RUN_TO_POSITION);
 
-        telemetry.addData("LAM", leftArmMotor.getCurrentPosition());
-        telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
-        telemetry.addData("Servo Target", armServoPosition);
+        if(telemetry != null) {
+            telemetry.addData("LAM", leftArmMotor.getCurrentPosition());
+            telemetry.addData("RAM", rightArmMotor.getCurrentPosition());
+            telemetry.addData("Servo Target", armServoPosition);
+        }
 
         if(leftClawHeightServo.getPosition() >= armServoPosition || position == Position.CUSTOM)
             leftClawHeightServo.setPosition(armServoPosition);
         clawOpenServo.setPosition(clawServoPosition);
 
-        telemetry.addData("Open", clawOpenServo.getPosition());
-        telemetry.addData("Open target", clawServoPosition);
+        if(telemetry != null) {
+            telemetry.addData("Open", clawOpenServo.getPosition());
+            telemetry.addData("Open target", clawServoPosition);
+        }
     }
 
     /**
@@ -240,8 +244,7 @@ public class Claw {
     }
 
     public void adjustClawAngle(double change) {
-        //armServoPosition = Range.clip((change / 40) + armServoPosition, -1, 1);
-        armServoPosition += (2 * change) / 137;
+        armServoPosition += Range.clip((2 * change) / 137, -1, 1);
         position = Position.CUSTOM;
         run();
     }

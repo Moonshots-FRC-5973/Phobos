@@ -110,11 +110,8 @@ public class AutonomousRight extends LinearOpMode {
 
         drivetrain.stop();
 
-        while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST) {
-            telemetry.addData("Right", distanceRight.getDistance(DistanceUnit.INCH));
-            telemetry.update();
+        while(distanceRight.getDistance(DistanceUnit.INCH) <= FAR_DIST)
             drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
-        }
     }
 
     private void case2() {
@@ -136,8 +133,6 @@ public class AutonomousRight extends LinearOpMode {
 
         while(distanceRight.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
             drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
-
-        drivetrain.stop();
     }
 
     private void findTarget() {

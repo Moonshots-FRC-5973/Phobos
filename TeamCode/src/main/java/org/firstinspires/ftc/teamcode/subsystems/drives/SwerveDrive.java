@@ -83,7 +83,7 @@ public class SwerveDrive extends Drivetrain {
         }
 
         // Translate XY input to degree and power
-        double targetAngle = Math.atan2(forward, strafe); // -180 - 180
+        double targetAngle = Math.atan2(forward, strafe); // -180 - 180 // Math.atan2 fails at -90 and 90
         double power = Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2));
         double leftAngleDiff = getLeftWheelAngle() - targetAngle;
 
@@ -100,7 +100,7 @@ public class SwerveDrive extends Drivetrain {
             // Quadrant: 4
         }
 
-        // Wheel |  Motor
+        // Wheel | Motor
         // <l, r><l, r>Power
         double llPower = power;
         double lrPower = power;

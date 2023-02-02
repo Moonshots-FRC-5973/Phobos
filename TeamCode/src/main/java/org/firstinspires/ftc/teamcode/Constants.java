@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 public class Constants {
     // _______________
     // --  GENERAL  --
+    // Minimum input for the robot to respond
     public static final double INPUT_THRESHOLD = 0.1;
 
     // _______________
@@ -19,14 +20,14 @@ public class Constants {
     // DEPRECATED: Power multiplier for the wheel to rotate. use Constants.DRIVE_PID_KP instead
     @Deprecated
     public static final double DRIVE_ROTATION_POWER_MODIFIER = 1 / Math.sin(Math.toRadians(20));
-    // Minimum input for the subsystem to respond
+    // Maximum motor speed percentage
     public static final double DRIVE_MOTOR_MAX_SPEED = 0.3;
 
     // ________________
     // ----  ARM   ----
     public static final int ARM_DOWN_POSITION = 0;
-    public static final int ARM_LOW_POSITION = 300;
-    public static final int ARM_MID_POSITION = 550;
+    public static final int ARM_LOW_POSITION = 250;
+    public static final int ARM_MID_POSITION = 450;
     public static final int ARM_HIGH_POSITION = 800;
     public static final int ARM_PICKUP_POSITION = 150;
     public static final double ARM_MOTOR_POWER = 0.75;

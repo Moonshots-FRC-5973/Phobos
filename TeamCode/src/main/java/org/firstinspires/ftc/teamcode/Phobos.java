@@ -61,12 +61,13 @@ public class Phobos extends OpMode
 
     // ----------
     // SUBSYSTEMS
-    private Drivetrain drive;
+    private Drivetrain driveyMcDriveDriverson;
     private Claw clawyMcClawClawferson;
 
     // Input state holders
     private boolean gp2bPressed = false;
     private boolean gp1aPressed = false;
+    private double uTime = runtime.milliseconds();
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -77,8 +78,8 @@ public class Phobos extends OpMode
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // INIT SUBSYSTEMS
-        clawyMcClawClawferson = new Claw(hardwareMap, telemetry);
-        drive = new MecanumDrive(hardwareMap, runtime, telemetry);
+        clawyMcClawClawferson = new Claw(hardwareMap, null);
+        driveyMcDriveDriverson = new MecanumDrive(hardwareMap, runtime, null);
 
         //Send the telemetry info pieces to the DS / Dashboard
         // Tell the driver that initialization is complete.
@@ -112,6 +113,7 @@ public class Phobos extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Runtime", runtime.seconds());
+        telemetry.addData("UPS", 1000 / (runtime.milliseconds() - uTime));
         telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
         telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
 
@@ -124,8 +126,10 @@ public class Phobos extends OpMode
 
         telemetry.addData("ArmLeft", clawyMcClawClawferson.getLeftCurrentHeight());
         telemetry.addData("ArmRight", clawyMcClawClawferson.getRightCurrentHeight());
-        telemetry.addData("IMU", "(" + drive.getIMU().getXAngle() + ", " + drive.getIMU().getYAngle() + ", " + drive.getIMU().getZAngle() + ")");
+        telemetry.addData("IMU", "(" + driveyMcDriveDriverson.getIMU().getXAngle() + ", " + driveyMcDriveDriverson.getIMU().getYAngle() + ", " + driveyMcDriveDriverson.getIMU().getZAngle() + ")");
         telemetry.update();
+
+        uTime = runtime.milliseconds();
     }
 
     /**
@@ -141,25 +145,25 @@ public class Phobos extends OpMode
         if(turnUp) {
             telemetry.addData("Drive", "Turning back to original front");
             if(turnRight) {
-                drive.turnRobotToAngle(-45);
+                driveyMcDriveDriverson.turnRobotToAngle(-45);
             } else if(turnLeft) {
-                drive.turnRobotToAngle(45);
+                driveyMcDriveDriverson.turnRobotToAngle(45);
             } else {
-                drive.turnRobotToAngle(0);
+                driveyMcDriveDriverson.turnRobotToAngle(0);
             }
         } else if(turnDown) {
             if (turnRight) {
-                drive.turnRobotToAngle(-135);
+                driveyMcDriveDriverson.turnRobotToAngle(-135);
             } else if (turnLeft) {
-                drive.turnRobotToAngle(135);
+                driveyMcDriveDriverson.turnRobotToAngle(135);
             } else {
                 telemetry.addData("Drive", "Turning to the reverse of start");
-                drive.turnRobotToAngle(180);
+                driveyMcDriveDriverson.turnRobotToAngle(180);
             }
         } else if(turnRight) {
-            drive.turnRobotToAngle(-90);
+            driveyMcDriveDriverson.turnRobotToAngle(-90);
         } else if(turnLeft) {
-            drive.turnRobotToAngle(90);
+            driveyMcDriveDriverson.turnRobotToAngle(90);
         }
         else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
@@ -172,11 +176,11 @@ public class Phobos extends OpMode
             if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
             if (Math.abs(rotate) <= Constants.INPUT_THRESHOLD) rotate = 0.0d;
 
-            drive.drive(forward, strafe, rotate);
+            driveyMcDriveDriverson.drive(forward, strafe, rotate);
         }
 
         if(gamepad1.a && !gp1aPressed && !gamepad1.start) {
-            drive.toggleFieldCentric();
+            driveyMcDriveDriverson.toggleFieldCentric();
         }
 
         gp1aPressed = gamepad1.a;
@@ -225,15 +229,15 @@ public class Phobos extends OpMode
         }
 
         if(gamepad2.left_bumper) {
-            clawyMcClawClawferson.moveLeftArmMotor(1);
+            clawyMcClawClawferson.moveLeftArmMotor(2);
         } else if(Math.abs(gamepad2.left_trigger) >= Constants.INPUT_THRESHOLD) {
-            clawyMcClawClawferson.moveLeftArmMotor(-gamepad2.left_trigger);
+            clawyMcClawClawferson.moveLeftArmMotor(-2);
         }
 
         if(gamepad2.right_bumper) {
-            clawyMcClawClawferson.moveRightArmMotor(1);
+            clawyMcClawClawferson.moveRightArmMotor(2);
         } else if(Math.abs(gamepad2.right_trigger) >= Constants.INPUT_THRESHOLD) {
-            clawyMcClawClawferson.moveRightArmMotor(-gamepad1.right_trigger);
+            clawyMcClawClawferson.moveRightArmMotor(-2);
         }
 
         gp2bPressed = gamepad2.b;
@@ -245,7 +249,7 @@ public class Phobos extends OpMode
     @Override
     public void stop() {
         clawyMcClawClawferson.stop();
-        drive.stop();
+        driveyMcDriveDriverson.stop();
     }
 
 }

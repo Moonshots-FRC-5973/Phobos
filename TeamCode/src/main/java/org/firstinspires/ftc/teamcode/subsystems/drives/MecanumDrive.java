@@ -164,7 +164,8 @@ public class MecanumDrive extends Drivetrain {
         double error = gyroTarget - imu.getZAngle();
         // Ensure we don't move farther than one rotation
         error %= 360;
-        telemetry.addData("Rot Error", error);
+        if(telemetry != null)
+            telemetry.addData("Rot Error", error);
         // If we are within the requested tolerance (Constants.DRIVE_ANGLE_TOLERANCE), we should stop turning
         if(Math.abs(error) <= Constants.DRIVE_ANGLE_TOLERANCE) {
             stop();
