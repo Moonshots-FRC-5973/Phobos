@@ -28,7 +28,7 @@ public class Constants {
     public static final int ARM_DOWN_POSITION = 0;
     public static final int ARM_LOW_POSITION = 250;
     public static final int ARM_MID_POSITION = 450;
-    public static final int ARM_HIGH_POSITION = 800;
+    public static final int ARM_HIGH_POSITION = 750;
     public static final int ARM_PICKUP_POSITION = 150;
     public static final double ARM_MOTOR_POWER = 0.75;
 
