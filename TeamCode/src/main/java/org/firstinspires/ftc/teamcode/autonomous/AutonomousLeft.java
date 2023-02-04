@@ -95,43 +95,43 @@ public class AutonomousLeft extends LinearOpMode {
     }
 
     private void case1() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5 && opModeIsActive())
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
-        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3 && opModeIsActive())
             drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
 
         drivetrain.stop();
 
-        while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST)
+        while(distanceLeft.getDistance(DistanceUnit.INCH) >= NEAR_DIST && opModeIsActive())
             drivetrain.drive(0.0d, -MOTOR_SPEED, 0.0d);
 
         // add a stop here? 
     }
 
     private void case2() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 7)
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 7 && opModeIsActive())
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
-        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3 && opModeIsActive())
             drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
     }
 
     private void case3() {
-        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5)
+        while(distanceBack.getDistance(DistanceUnit.INCH) <= TILE_DIST + 5 && opModeIsActive())
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
 
-        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3)
+        while(distanceBack.getDistance(DistanceUnit.INCH) >= TILE_DIST + 3 && opModeIsActive())
             drivetrain.drive(-MOTOR_SPEED, 0.0d, 0.0d);
 
         drivetrain.stop();
 
-        while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST)
+        while(distanceLeft.getDistance(DistanceUnit.INCH) <= FAR_DIST && opModeIsActive())
             drivetrain.drive(0.0d, MOTOR_SPEED, 0.0d);
     }
 
     private void findTarget() {
-        while(colorMcColorColorson.getIntensity() <= 200) {
+        while(colorMcColorColorson.getIntensity() <= 200 && opModeIsActive()) {
             drivetrain.drive(MOTOR_SPEED, 0.0d, 0.0d);
         }
 
